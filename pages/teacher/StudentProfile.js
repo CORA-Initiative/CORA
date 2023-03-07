@@ -4,12 +4,11 @@ import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 
 export default function StudentProfile() {
   return (
-    <>
+    <div className="p-12 pt-4">
       <div className="p-4 flex flex-row flex-start gap-1">
         <button>
-          <FontAwesomeIcon icon={faChevronLeft} size="md" />
+          <FontAwesomeIcon icon={faChevronLeft} size="md" /> Back
         </button>
-        <p>Back</p>
       </div>
       <div className="flex justify-center">
         <p className="font-bold text-3xl">Student Profile</p>
@@ -18,7 +17,7 @@ export default function StudentProfile() {
       <div className="flex flex-col">
         {/* Student Details */}
         <div className="flex flex-1 py-8 px-12">
-          <table class="table-fixed w-full text-md   border-separate border-spacing-2 text-left">
+          <table class="table-fixed w-1/2 text-md text-left">
             <thead>
               <tr>
                 <th>Name</th>
@@ -35,8 +34,8 @@ export default function StudentProfile() {
         </div>
 
         {/* Pre-Test Results */}
-        <div className="flex flex-col p-12 pt-6 border-t-4 border-gray-500">
-          <table class="table-fixed w-full text-md   border-separate border-spacing-2 text-left mb-8">
+        <div className="flex flex-col p-12 border-t-4 border-cyan-600 gap-10 ">
+          <table class="table-fixed text-md text-left w-1/2">
             <tr>
               <th>Pre-Test Passage</th>
               <td className="uppercase">Liquids Good For You</td>
@@ -46,7 +45,7 @@ export default function StudentProfile() {
               <td>June 7, 2022</td>
             </tr>
           </table>
-          <table class="table-fixed w-full text-md   border-separate border-spacing-2 text-left">
+          <table class="table-fixed w-full text-md text-left">
             <thead>
               <tr>
                 <td></td>
@@ -74,14 +73,20 @@ export default function StudentProfile() {
               </tr>
             </tbody>
           </table>
+          <table class="table-fixed text-md text-left w-1/2">
+            <tr>
+              <th>Oral Reading Profile</th>
+              <td className="uppercase font-bold underline">Frustation</td>
+            </tr>
+          </table>
         </div>
 
         {/* Post-test Results */}
         {/* Pre-Test Results */}
-        <div className="flex flex-col p-12 pt-6 border-t-4 border-gray-500">
-          <table class="table-fixed w-full text-md   border-separate border-spacing-2 text-left mb-8">
+        <div className="flex flex-col p-12 border-t-4 border-cyan-600 gap-10">
+          <table class="table-fixed w-1/2 text-md text-left">
             <tr>
-              <th>Post test Passage</th>
+              <th>Post Test Passage</th>
               <td className="uppercase">Air and Sunlight</td>
             </tr>
             <tr>
@@ -89,7 +94,7 @@ export default function StudentProfile() {
               <td>February 7, 2023</td>
             </tr>
           </table>
-          <table class="table-fixed w-full text-md   border-separate border-spacing-2 text-left">
+          <table class="table-fixed w-full text-md text-left">
             <thead>
               <tr>
                 <td></td>
@@ -117,8 +122,14 @@ export default function StudentProfile() {
               </tr>
             </tbody>
           </table>
+          <table class="table-fixed text-md text-left w-1/2">
+            <tr>
+              <th>Oral Reading Profile</th>
+              <td className="uppercase font-bold underline">Frustation</td>
+            </tr>
+          </table>
         </div>
       </div>
-    </>
+    </div>
   );
 }

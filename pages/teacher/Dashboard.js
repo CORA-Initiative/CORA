@@ -3,7 +3,7 @@ import Toggle from "../../components/toggle/Toggle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
-
+import SearchBox from "@/components/searchBox/SearchBox";
 // import "tw-elements";
 
 export default function Dashboard() {
@@ -15,8 +15,8 @@ export default function Dashboard() {
   const results = true;
 
   return (
-    <div className="px-8 md:px-24 py-4">
-      <div className="flex py-2 flex-row justify-between mt-6">
+    <div className="p-12 md:px-24 pt-8">
+      <div className="flex py-2 flex-row justify-between mt-6 mb-10">
         <div className="w-3/4 flex flex-row gap-6">
           <div className="flex items-center overflow-hidden  text-cyan-600">
             <FontAwesomeIcon icon={faUser} size="2xl" />
@@ -35,15 +35,7 @@ export default function Dashboard() {
 
       {/* SECTIONS*/}
       {/* Search section box */}
-      <div className="mt-10 rounded-md overflow-clip">
-        <input
-          type="text"
-          className="w-full bg-slate-200 text-gray-900 pl-4 p-2"
-          id="exampleFormControlInputText"
-          placeholder="Search section"
-        />
-      </div>
-
+      <SearchBox text="Search section"></SearchBox>
       <div className="flex-1 mt-4">
         {/* Table header */}
         <table className="table-auto md:table-fixed w-full text-md text-left">
@@ -93,14 +85,7 @@ export default function Dashboard() {
       <div className="flex flex-row gap-12 mt-10 justify-between">
         {/* Search student box */}
         <div className="w-1/2">
-          <div className="rounded-md overflow-clip border">
-            <input
-              type="text"
-              className="w-full bg-slate-200 text-gray-900 pl-4 p-2"
-              id="exampleFormControlInputText"
-              placeholder="Search students"
-            />
-          </div>
+          <SearchBox text="Search section"></SearchBox>
           <div className="mt-4 w-full">
             {/* Table header */}
             <table className="table-auto md:table-fixed w-full text-md text-left">
