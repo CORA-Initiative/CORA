@@ -21,14 +21,29 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <main className="flex flex-col items-center justify-center h-screen">
         <div>
-          <h1>CORA</h1>
-          <h3>Computerized Oral Reading Assessment</h3>
-          <h4>Login as</h4>
-          <a href="./student/studentLogin">
-            <button>Student</button>
-          </a>
+          <div className="w-full text-9xl text-center tracking-widest">
+            CORA
+          </div>
+          <div className="text-4xl text-center mt-3">
+            Computerized Oral Reading Assessment
+          </div>
+        </div>
+        <div className="mt-20 flex flex-col">
+          <div className="text-4xl text-center">Login as</div>
+          <div className="mt-14 flex items-center justify-center gap-4">
+            <a className="" href="./student/studentLogin">
+              <button className="px-10 py-1 text-white font-bold text-lg bg-blue-600 rounded hover:bg-blue-900">
+                Student
+              </button>
+            </a>
+            <a className="" href="./teacher/teacherLogin">
+              <button className="px-10 py-1 text-black font-bold text-lg bg-white border border-black rounded hover:bg-gray-200">
+                Teacher
+              </button>
+            </a>
+          </div>
         </div>
       </main>
     </>

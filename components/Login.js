@@ -5,11 +5,15 @@ import { useAuth } from "../context/AuthContext";
 export default function Login({ userCred }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(true);
 
   const { login, signup, currentUser } = useAuth();
   console.log(currentUser);
+
+  // will toggle the type of entry (i.e., login or register)
+  const toggleEntry = () => setIsLoggingIn(!isLoggingIn);
 
   async function submitHandler() {
     if (!email || !password) {
@@ -38,7 +42,18 @@ export default function Login({ userCred }) {
       {error && <div>{error}</div>}
       <div className="flex items-center justify-center">
         <div className="flex flex-col w-96 p-4">
-          <div>Enter your information to login.</div>
+          <div>
+            Enter your information to {isLoggingIn ? "login" : "register"}.
+          </div>
+          {!isLoggingIn && (
+            <input
+              className="w-full px-4 py-2 mt-6 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              type="text"
+              placeholder="Full Name"
+            />
+          )}
           <input
             className="w-full px-4 py-2 mt-6 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
             value={email}
@@ -58,11 +73,17 @@ export default function Login({ userCred }) {
               className="px-10 py-1 mt-20 text-white font-bold text-lg bg-blue-600 rounded hover:bg-blue-900"
               onClick={submitHandler}
             >
-              LOGIN
+              {isLoggingIn ? "Login" : "Register"}
             </button>
-            <div className="text-xs text-center mt-4 w-40">
-              Don't have an account yet? You can ask your teacher.
+            <div
+              className="text-xs text-center mt-4 w-40 cursor-pointer"
+              onClick={toggleEntry}
+            >
+              {isLoggingIn
+                ? "Don't have an account yet? Sign up here."
+                : "Already have an account? Log in here."}
             </div>
+            <div></div>
             <h3>
               <Link href="/">Home</Link>
             </h3>
