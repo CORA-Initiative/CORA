@@ -19,6 +19,6 @@ module.exports = {
         coraOrange: "#FE7235",
       },
     },
+    plugins: [require("tw-elements/dist/plugin")],
   },
-  plugins: [require("tw-elements/dist/plugin")],
 };
