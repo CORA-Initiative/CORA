@@ -43,7 +43,7 @@ export default function ChangeProfile() {
             <div className="flex sm:flex-row flex-col gap-8 border mt-8">
                 <div className="flex flex-col items-center gap-4">
                     <p className="">Current Picture</p>
-                    <div className="flex h-28 w-28 rounded-full overflow-hidden border bg-mainColor2">
+                    <div className="flex h-28 w-28 rounded-full overflow-hidden border bg-coraBlue-2">
                         <img id="currentProfile" className="inline-block h-28 w-28 rounded-full" src={currentProfile} alt=""  />
                     </div>
                 </div>
@@ -99,7 +99,7 @@ export default function ChangeProfile() {
             </div>
 
             <div className="mt-12">
-                <button className="px-10 py-1 text-white font-bold text-lg bg-cyan-600 rounded hover:bg-cyan-900">Save changes</button>
+                <button className="px-10 py-1 text-white font-bold text-lg bg-coraBlue-1 rounded hover:bg-coraBlue-4">Save changes</button>
             </div>
 
         </div>
