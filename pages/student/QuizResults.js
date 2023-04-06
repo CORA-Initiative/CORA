@@ -1,5 +1,6 @@
 import React from "react";
 import BackButton from "@/components/BackButton";
+import Link from "next/link";
 
 export default function quizResults({
   test_type = "Pre-Test",
@@ -31,9 +32,11 @@ export default function quizResults({
         </div>
 
         <div className="flex flex-col items-center mt-4">
-          <button className="bg-coraBlue-1 py-4 px-20 text-coraWhite text-xl font-bold rounded-lg hover:bg-cyan-700">
-            Return Home
-          </button>
+          <Link href="/student/dashboard">
+            <button className="bg-coraBlue-1 py-4 px-20 text-coraWhite text-xl font-bold rounded-lg hover:bg-cyan-700">
+              Return Home
+            </button>
+          </Link>
         </div>
       </div>
     </div>

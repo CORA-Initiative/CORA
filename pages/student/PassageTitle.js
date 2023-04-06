@@ -1,5 +1,6 @@
 import React from "react";
 import BackButton from "@/components/BackButton";
+import Link from "next/link";
 
 export default function passageTitle({
   test_type = "Pre-test",
@@ -19,9 +20,11 @@ export default function passageTitle({
         </div>
         <h1 className="font-bold text-8xl">{title}</h1>
         <p className="text-lg">{instructions}</p>
-        <button className="p-4 px-32 bg-coraBlue-1 rounded-lg text-coraWhite text-xl uppercase font-bold">
-          Start Reading
-        </button>
+        <Link href="/student/passageReading">
+          <button className="p-4 px-32 bg-coraBlue-1 rounded-lg text-coraWhite text-xl uppercase font-bold">
+            Start Reading
+          </button>
+        </Link>
       </div>
     </div>
   );

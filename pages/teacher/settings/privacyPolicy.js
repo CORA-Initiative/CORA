@@ -1,14 +1,15 @@
 import React from "react";
+// import { useAuth } from "../context/AuthContext";
+import Container from "@/components/Container";
+import Toggle from "../../../components/toggle/Toggle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import TextContainer from "@/components/TextContainer";
 import BackButton from "@/components/BackButton";
 
-export default function TermsOfService() {
+export default function privacyPolicy() {
   const title = "Settings";
-  const subtitle = "Terms of Service";
-  const subsection = "Agreement to Terms";
-  const date = "Last Updated: "; // + new Date().toLocaleString() + ""
+  const subtitle = "Privacy Policy";
 
   return (
     <div className="p-12 md:px-24 pt-8">
@@ -24,16 +25,9 @@ export default function TermsOfService() {
         {/* Logout Button */}
         <div className="mt-16">
           <p className="text-2xl font-extrabold">{subtitle}</p>
-          {/* TODO: get date from database */}
-          <p>{date}</p>
         </div>
       </div>
-
-      {/* Text Content from Database */}
-      <div className="mt-12">
-        <p className="text-xl font-bold">{subsection}</p>
-      </div>
-
+      {/* TODO: get data from database */}
       <TextContainer></TextContainer>
     </div>
   );

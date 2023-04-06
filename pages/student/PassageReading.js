@@ -1,6 +1,6 @@
 import { React, useState } from "react";
 import BackButton from "@/components/BackButton";
-
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircle,
@@ -71,14 +71,17 @@ export default function passageReading({
         )}
 
         {/* Take quiz button */}
-        <button
-          className={`flex flex-row items-center gap-2 ${
-            isRecordingCompleted ? "visible" : "invisible"
-          }`}
-        >
-          <p className="underline text-lg">Take Quiz</p>
-          <FontAwesomeIcon icon={faChevronRight} size="sm" />
-        </button>
+
+        <Link href="/student/takeQuiz">
+          <button
+            className={`flex flex-row items-center gap-2 ${
+              isRecordingCompleted ? "visible" : "invisible"
+            }`}
+          >
+            <p className="underline text-lg">Take Quiz</p>
+            <FontAwesomeIcon icon={faChevronRight} size="sm" />
+          </button>
+        </Link>
       </div>
     </div>
   );

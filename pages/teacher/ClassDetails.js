@@ -2,6 +2,8 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import SearchBox from "@/components/searchBox/SearchBox";
+import BackButton from "@/components/BackButton";
+import Link from "next/link";
 
 export default function classDetails({
   grade = 2,
@@ -13,13 +15,9 @@ export default function classDetails({
   const grade_level = 2;
   const section_name = "Sampaguita";
   return (
-    <div className="p-12 pt-8">
-      <div className="flex flex-row flex-start gap-1 border">
-        <button>
-          <FontAwesomeIcon icon={faChevronLeft} size="md" />
-        </button>
-        <p>Back</p>
-      </div>
+    <div className="p-12 pt-4">
+      {/* Back button */}
+      <BackButton />
       <div className="flex justify-center my-6">
         <p className="font-bold text-3xl">
           Grade {grade_level} - {section_name}
@@ -29,7 +27,7 @@ export default function classDetails({
       <div className="mt-4 flex lg:w-2/3 flex-col md:flex-row  gap-8">
         {/* Results Summary*/}
         <div className="flex flex-col border-blue-600 gap-4">
-          <p className="text-2xl font-bold">Results Summary</p>
+          <p className="text-2xl font-bold text-coraBlue-1">Results Summary</p>
           <table class="table-fixed w-full text-left">
             <thead>
               <tr className="border-b-4 border-black text-lg">
@@ -60,7 +58,7 @@ export default function classDetails({
       </div>
       {/* --------------------- Section Information */}
       <div class="flex flex-col w-full mt-8 lg:w-2/3 gap-4">
-        <p class="font-bold text-2xl">Section Information</p>
+        <p class="font-bold text-2xl text-coraBlue-1">Section Information</p>
         <div className="flex flex-row gap-10">
           {/* --------------------------2nd column */}
           <div className="flex flex-col w-1/2">
@@ -113,7 +111,9 @@ export default function classDetails({
                 <td>Frustation</td>
                 <td>Instructional</td>
                 <td className="text-center">
-                  <button className="underline">View</button>
+                  <Link href="/teacher/studentProfile">
+                    <button className="underline">View</button>
+                  </Link>
                 </td>
               </tr>
             </tbody>

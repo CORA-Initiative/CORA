@@ -1,15 +1,12 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import BackButton from "@/components/BackButton";
 
 export default function studentProfile() {
   return (
     <div className="p-12 pt-4">
-      <div className="p-4 flex flex-row flex-start gap-1">
-        <button>
-          <FontAwesomeIcon icon={faChevronLeft} size="md" /> Back
-        </button>
-      </div>
+      {/* Back button */}
+      <BackButton />
       <div className="flex justify-center">
         <p className="font-bold text-3xl">Student Profile</p>
       </div>
