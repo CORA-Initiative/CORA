@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 
-export default function StudentProfile() {
+export default function studentProfile() {
   return (
     <div className="p-12 pt-4">
       <div className="p-4 flex flex-row flex-start gap-1">

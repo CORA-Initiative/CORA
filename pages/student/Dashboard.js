@@ -1,9 +1,9 @@
 import React from "react";
-import ReadingProfileSummary from "@/components/studentDashboard/ReadingProfileSummary";
+import ReadingProfileSummary from "@/components/StudentDashboard/ReadingProfileSummary";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile } from "@fortawesome/free-solid-svg-icons";
 
-export default function Dashboard({ user = "Juan Dela Cruz" }) {
+export default function dashboard({ user = "Juan Dela Cruz" }) {
   return (
     <div className="p-12 md:px-24 pt-8">
       <div className="flex py-2 flex-row justify-between mt-6 mb-10">

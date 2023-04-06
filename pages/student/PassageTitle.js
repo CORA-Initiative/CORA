@@ -1,7 +1,7 @@
 import React from "react";
 import BackButton from "@/components/BackButton";
 
-export default function PassageTitle({
+export default function passageTitle({
   test_type = "Pre-test",
   grade = 2,
   title = "Liquids Good for You",

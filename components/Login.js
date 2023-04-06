@@ -68,7 +68,7 @@ export default function Login({ userCred }) {
             type="password"
             placeholder="Password"
           />
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center gap-2">
             <button
               className="px-10 py-1 mt-20 text-white font-bold text-lg bg-blue-600 rounded hover:bg-blue-900"
               onClick={submitHandler}

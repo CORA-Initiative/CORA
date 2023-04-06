@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import SearchBox from "@/components/searchBox/SearchBox";
 
-export default function ClassDetails({
+export default function classDetails({
   grade = 2,
   section = "Sampaguita",
   total = 20,

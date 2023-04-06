@@ -1,7 +1,7 @@
 import React from "react";
 import BackButton from "@/components/BackButton";
 
-export default function Quiz({
+export default function quizPage({
   test_type = "Pre-Test",
   passage_title = "Liquids Good For You",
 }) {

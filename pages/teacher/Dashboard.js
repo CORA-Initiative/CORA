@@ -6,7 +6,7 @@ import Image from "next/image";
 import SearchBox from "@/components/searchBox/SearchBox";
 // import "tw-elements";
 
-export default function Dashboard() {
+export default function dashboard() {
   const user = "Jose Andres M. Luna";
   const role = "Teacher";
   const school = "Miagao Elementary School";

@@ -11,7 +11,7 @@ import {
   faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 
-export default function PassageReading({
+export default function passageReading({
   title = "Liquids Good For You",
   text = "There are many liquids that are good for our health like water, fruit juice, and milk. Milk makes our bones strong. Juice gives us vitamins, while water cleans our body. Let's drink milk, juice, and water to make us healthy.",
 }) {
