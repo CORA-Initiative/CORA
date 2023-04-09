@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
+import { db } from "../firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 export default function Login({ userCred }) {
   const [email, setEmail] = useState("");
@@ -28,7 +30,36 @@ export default function Login({ userCred }) {
       }
       return;
     }
-    await signup(email, password);
+    // Will signup the user and store the user in credentials variable
+    const credentials = await signup(email, password);
+
+    // Based on the userCred (teacher or student), the new user will be
+    // added to its corresponding collection (teachers or students) in
+    // the database (Firestore)
+    if (userCred == "teacher") {
+      try {
+        const docRef = await addDoc(collection(db, "teachers"), {
+          email: credentials.user.email,
+          // enter other info here except password; passwords can't be retrieved
+        });
+        console.log("Document written with ID: ", docRef.id);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+    } else {
+      try {
+        const docRef = await addDoc(collection(db, "students"), {
+          email: credentials.user.email,
+          // enter other info here except password; passwords can't be retrieved
+        });
+        console.log("Document written with ID: ", docRef.id);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+    }
+    // TODO 1: Make the document id same as the user id (auth)
+    // TODO 2: When doing TODO 1, also find a way to not do these collection
+    // operations on the client side tip: Use Firebase Authentication triggers
   }
 
   return (
@@ -91,41 +122,5 @@ export default function Login({ userCred }) {
         </div>
       </div>
     </div>
-    // <div className="flex-1 text-xs sm:text-sm flex flex-col justify-center items-center gap-2 sm:gap-4">
-    //   <h1 className="font-extrabold select-none text-2xl sm:text-4xl uppercase">
-    //     {isLoggingIn ? "Login" : "register"}
-    //   </h1>
-    //   {error && (
-    //     <div className="w-full max-w-[40ch] border-rose-400 border text-center border-solid text-rose-400 py-2">
-    //       {error}
-    //     </div>
-    //   )}
-    //   <input
-    //     type="text"
-    //     value={email}
-    //     onChange={(e) => setEmail(e.target.value)}
-    //     placeholder="Email Address"
-    //     className="outline-none duration-300 border-b-2 border-solid border-white focus:border-cyan-300 text-slate-900 p-2 w-full max-w-[40ch]"
-    //   />
-    //   <input
-    //     value={password}
-    //     onChange={(e) => setPassword(e.target.value)}
-    //     type="password"
-    //     placeholder="Password"
-    //     className="outline-none text-slate-900 p-2 w-full max-w-[40ch] duration-300 border-b-2 border-solid border-white focus:border-cyan-300"
-    //   />
-    //   <button
-    //     onClick={submitHandler}
-    //     className="w-full max-w-[40ch] border border-white border-solid uppercase py-2 duration-300 relative after:absolute after:top-0 after:right-full after:bg-white after:z-10 after:w-full after:h-full overflow-hidden hover:after:translate-x-full after:duration-300 hover:text-slate-900"
-    //   >
-    //     <h2 className="relative z-20">SUBMIT</h2>
-    //   </button>
-    //   <h2
-    //     className="duration-300 hover:scale-110 cursor-pointer"
-    //     onClick={() => setIsLoggingIn(!isLoggingIn)}
-    //   >
-    //     {!isLoggingIn ? "Login" : "Register"}
-    //   </h2>
-    // </div>
   );
 }
