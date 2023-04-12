@@ -1,5 +1,4 @@
 import React from "react";
-// import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faListAlt,
@@ -13,9 +12,6 @@ import { useRouter } from "next/router";
 
 export default function Settings() {
   const title = "Teacher Settings";
-
-  //const { logout, currentUser } = useAuth();
-  //console.log(currentUser);
   const router = useRouter();
 
   return (
@@ -24,31 +20,21 @@ export default function Settings() {
         <BackButton />
       </div>
 
-        {/* Title */}
-        <div className="flex justify-between py-2 mt-8 mb-10">
-            <div className="">
-                <p className="text-2xl font-extrabold">{title}</p>
-            </div>
-            {/* Logout Button */}
-            <div className="">
-                <button className="px-10 py-1 text-white font-bold text-lg bg-coraBlue-1 rounded hover:bg-coraBlue-4">Logout</button>
-            </div>
-            
+      {/* Title */}
+      <div className="flex justify-between py-2 mt-8 mb-10">
+        <div className="">
+          <p className="text-2xl font-extrabold">{title}</p>
         </div>
         {/* Logout Button */}
         <div className="">
-          <button className="px-10 py-1 text-white font-bold text-lg bg-cyan-600 rounded hover:bg-cyan-900">
+          <button className="px-10 py-1 text-white font-bold text-lg bg-coraBlue-1 rounded hover:bg-coraBlue-4">
             Logout
           </button>
         </div>
       </div>
 
-      {/* <div className="flex flex-col items-center justify-center">
-            <button onClick={logout}>Logout</button>
-        </div> */}
-        
       {/* Other settings */}
-      <div className="mt-16 grid grid-cols-3 gap-10 md:mr-72 w-full border">
+      <div className="mt-16 grid grid-cols-3 gap-10 md:mr-72 w-full">
         <button
           onClick={() => router.push("/teacher/settings/accountDetails")}
           className="flex flex-col p-6 gap-y-3 items-center outline rounded text-cyan-600 hover:text-cyan-800"

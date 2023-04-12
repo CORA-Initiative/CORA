@@ -1,5 +1,6 @@
 import React from "react";
 import BackButton from "@/components/BackButton";
+import { useRouter } from "next/router";
 
 export default function AccountDetails() {
   const title = "Settings";
@@ -8,6 +9,8 @@ export default function AccountDetails() {
   const emailHolder = "jal@school.com.ph";
   const teacherIDHolder = "ABC012345";
   const passwordHolder = "*******";
+
+  const router = useRouter();
 
   return (
     <div className="p-12 md:px-24 pt-8">
@@ -23,7 +26,6 @@ export default function AccountDetails() {
           <p className="text-2xl font-extrabold">{subtitle}</p>
         </div>
       </div>
-
 
       {/* Account Details */}
       <div>
@@ -54,13 +56,12 @@ export default function AccountDetails() {
           </tbody>
         </table>
       </div>
-       
-        <div className="mt-12">
-            <button className="px-10 py-1 text-coraBlue-1 font-bold text-lg outline outline-coraBlue-1 rounded hover:outline-coraBlue-4 hover:text-coraBlue-4">Edit</button>
-        </div>
 
       <div className="mt-12">
-        <button className="px-10 py-1 text-mainColor0 font-bold text-lg outline outline-mainColor0 rounded hover:outline-mainColor4 hover:text-mainColor4">
+        <button
+          onClick={() => router.push("/teacher/settings/editAccountDetails")}
+          className="px-10 py-1 text-black font-bold text-lg outline outline-black rounded hover:outline-coraBlue-4 hover:text-coraBlue-4"
+        >
           Edit
         </button>
       </div>
