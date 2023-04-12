@@ -2,25 +2,26 @@ import Container from "@/components/Container";
 import Toggle from "../../components/toggle/Toggle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import Image from "next/image";
 import SearchBox from "@/components/searchBox/SearchBox";
 // import "tw-elements";
+import Link from "next/link";
 
-export default function Dashboard() {
+export default function dashboard() {
   const user = "Jose Andres M. Luna";
   const role = "Teacher";
   const school = "Miagao Elementary School";
-  const year = new Date().getFullYear();
+  const year = 2023;
 
   const results = true;
 
   return (
-    <div className="p-12 md:px-24 pt-8">
+    <div className="p-12 pt-4">
       <div className="flex py-2 flex-row justify-between mt-6 mb-10">
         <div className="w-3/4 flex flex-row gap-6">
           <div className="flex items-center overflow-hidden  text-cyan-600">
             <FontAwesomeIcon icon={faUser} size="2xl" />
           </div>
+
           <div className="">
             <p className="text-2xl font-bold">{user}</p>
             <p className="text-l">
@@ -28,9 +29,11 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
-        <button className=" flex align-start">
-          <FontAwesomeIcon icon={faGear} size="xl" />
-        </button>
+        <Link href="/teacher/settings/settings">
+          <button className="flex align-start">
+            <FontAwesomeIcon icon={faGear} size="xl" />
+          </button>
+        </Link>
       </div>
 
       {/* SECTIONS*/}
@@ -67,12 +70,14 @@ export default function Dashboard() {
                 <td>25</td>
                 <td className="py-4">
                   <div className="flex flex-col justify-center gap-2">
-                    <button className="font-bold p-2 rounded-md bg-cyan-600 text-white border-2 border-cyan-600 text-sm">
-                      View Summary
-                    </button>
-                    <button className="font-bold p-2 rounded-md bg-white text-cyan-600 border-2 border-cyan-600 text-sm">
+                    <Link href="/teacher/classDetails">
+                      <button className="font-bold p-2 rounded-md bg-cyan-600 text-white border-2 border-cyan-600 text-sm">
+                        View Summary
+                      </button>
+                    </Link>
+                    {/* <button className="font-bold p-2 rounded-md bg-white text-cyan-600 border-2 border-cyan-600 text-sm">
                       Add Student
-                    </button>
+                    </button> */}
                   </div>
                 </td>
               </tr>
@@ -85,7 +90,7 @@ export default function Dashboard() {
       <div className="flex flex-row gap-12 mt-10 justify-between">
         {/* Search student box */}
         <div className="w-1/2">
-          <SearchBox text="Search section"></SearchBox>
+          <SearchBox text="Search student"></SearchBox>
           <div className="mt-4 w-full">
             {/* Table header */}
             <table className="table-auto md:table-fixed w-full text-md text-left">
@@ -106,9 +111,9 @@ export default function Dashboard() {
               {results && (
                 <tbody>
                   <tr>
-                    <td className="py-2">2</td>
+                    <td className="py-2">Juan dela Cruz</td>
+                    <td>2</td>
                     <td>Sampaguita</td>
-                    <td>0</td>
                   </tr>
                 </tbody>
               )}
