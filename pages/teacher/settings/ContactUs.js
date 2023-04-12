@@ -33,23 +33,27 @@ export default function ContactUs() {
         </div>
       </div>
 
-      {/* Contact Details */}
-      <div className="flex flex-col">
-        <p className="text-lg font-semibold">{heading1}</p>
-        <p className="">{heading2}</p>
-        <div className="flex flex-row gap-x-8 mt-8 text-lg">
-          <div className="text-mainColor4">
-            <FontAwesomeIcon icon={faMapPin} size="md" />
-          </div>
-          <p>{address}</p>
-        </div>
+          {/* Contact Details */}
+          <div className="flex flex-col">
+              <p className="text-lg font-semibold">{heading1}</p>
+              <p className="">{heading2}</p>
+              <div className="flex flex-row gap-x-8 mt-8 text-lg">
+                  <div className="text-coraOrange">
+                      <FontAwesomeIcon icon={faMapPin} size="md" />
+                  </div>
+                  <p>{address}</p>
+              </div>
 
-        <div className="flex flex-row gap-x-6 mt-4 text-lg">
-          <div className="text-mainColor4">
-            <FontAwesomeIcon icon={faEnvelope} size="md" />
-          </div>
-          {/* TODO: Put link that will automatically open user's email app */}
-          <p>{email}</p>
+              <div className="flex flex-row gap-x-6 mt-4 text-lg">
+                  <div className="text-coraOrange">
+                      <FontAwesomeIcon icon={faEnvelope} size="md" />
+                  </div>
+                  {/* TODO: Put link that will automatically open user's email app */}
+                  <p>{email}</p>
+              </div>
+    
+            </div>
+    
         </div>
       </div>
     </div>

@@ -24,6 +24,7 @@ export default function AccountDetails() {
         </div>
       </div>
 
+
       {/* Account Details */}
       <div>
         <table className="table-fixed">
@@ -53,6 +54,10 @@ export default function AccountDetails() {
           </tbody>
         </table>
       </div>
+       
+        <div className="mt-12">
+            <button className="px-10 py-1 text-coraBlue-1 font-bold text-lg outline outline-coraBlue-1 rounded hover:outline-coraBlue-4 hover:text-coraBlue-4">Edit</button>
+        </div>
 
       <div className="mt-12">
         <button className="px-10 py-1 text-mainColor0 font-bold text-lg outline outline-mainColor0 rounded hover:outline-mainColor4 hover:text-mainColor4">

@@ -14,6 +14,7 @@ module.exports = {
           1: "#0084AC",
           2: "#6DB5CB",
           3: "#B7D8DF",
+          4: "#00546d",
         },
         coraWhite: "#FCF5EF",
         coraOrange: "#FE7235",

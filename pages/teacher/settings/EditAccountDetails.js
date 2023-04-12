@@ -71,7 +71,7 @@ export default function EditAccountDetails() {
 
                     <label className="mt-6 opacity-60">Full Name</label>
                     <input
-                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-coraBlue-1"
                         defaultValue={nameHolder}
                         onChange={(e) => setName(e.target.value)}
                         type="text"
@@ -79,7 +79,7 @@ export default function EditAccountDetails() {
 
                     <label className="mt-4 opacity-60">Email</label>  
                     <input
-                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-coraBlue-1"
                         defaultValue={emailHolder}
                         onChange={(e) => setEmail(e.target.value)}
                         type="email"
@@ -88,7 +88,7 @@ export default function EditAccountDetails() {
 
                     <label className="mt-4 opacity-60">Teacher ID</label>  
                     <input
-                        className="opacity-70 w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        className="opacity-70 w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-coraBlue-1"
                         value={teacherIDHolder}
                         type="text"
                         readonly
@@ -97,7 +97,7 @@ export default function EditAccountDetails() {
 
                     <label className="mt-4 opacity-60">Password</label>
                     <input
-                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-coraBlue-1"
                         value={passwordHolder}
                         onChange={(e) => setPassword(e.target.value)}
                         type="password"
@@ -115,7 +115,7 @@ export default function EditAccountDetails() {
                 <div className="sm:mt-10 mt-6 flex flex-col w-96 p-0">
                     <label className="opacity-60">Current Password</label>
                     <input
-                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-coraBlue-1"
                         //value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         type="password"
@@ -124,7 +124,7 @@ export default function EditAccountDetails() {
                     
                     <label className="mt-4 opacity-60">New Password</label>
                     <input
-                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-coraBlue-1"
                         //value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         type="password"
@@ -133,7 +133,7 @@ export default function EditAccountDetails() {
                     
                     <label className="mt-4 opacity-60">Retype New Password</label>
                     <input
-                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        className="w-full px-4 py-2 mt-0 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-coraBlue-1"
                         //value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         type="password"
@@ -148,7 +148,7 @@ export default function EditAccountDetails() {
 
         <div className="mt-12">
             <button
-            className="px-10 py-1 text-white font-bold text-lg bg-cyan-600 rounded hover:bg-cyan-900"
+            className="px-10 py-1 text-white font-bold text-lg bg-coraBlue-1 rounded hover:bg-coraBlue-4"
             type="Submit"
             //value={submit}
             >

@@ -24,10 +24,16 @@ export default function Settings() {
         <BackButton />
       </div>
 
-      {/* Title */}
-      <div className="flex justify-between py-2 mt-8 mb-10">
-        <div className="">
-          <p className="text-2xl font-bold">{title}</p>
+        {/* Title */}
+        <div className="flex justify-between py-2 mt-8 mb-10">
+            <div className="">
+                <p className="text-2xl font-extrabold">{title}</p>
+            </div>
+            {/* Logout Button */}
+            <div className="">
+                <button className="px-10 py-1 text-white font-bold text-lg bg-coraBlue-1 rounded hover:bg-coraBlue-4">Logout</button>
+            </div>
+            
         </div>
         {/* Logout Button */}
         <div className="">
@@ -40,7 +46,7 @@ export default function Settings() {
       {/* <div className="flex flex-col items-center justify-center">
             <button onClick={logout}>Logout</button>
         </div> */}
-
+        
       {/* Other settings */}
       <div className="mt-16 grid grid-cols-3 gap-10 md:mr-72 w-full border">
         <button
