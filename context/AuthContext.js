@@ -1,14 +1,13 @@
 // WHAT: A wrapper for the entire application that is going to allow any page to access authentication information
 
 import React, { useContext, useState, useEffect, useRef } from "react";
-import { auth, db } from "../firebase";
+import { auth } from "../firebase";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
 
 const AuthContext = React.createContext();
 
@@ -21,9 +20,13 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const userInfo = useRef();
 
-  function signup(email, password) {
-    createUserWithEmailAndPassword(auth, email, password);
-    return;
+  async function signup(email, password) {
+    const credentials = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    return credentials;
   }
 
   function login(email, password) {
