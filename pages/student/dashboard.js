@@ -1,9 +1,21 @@
-import React from "react";
+import { React, useState } from "react";
 import ReadingProfileSummary from "@/components/StudentDashboard/ReadingProfileSummary";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile } from "@fortawesome/free-solid-svg-icons";
+import { thisUser } from "@/context/UserContext";
+import { useAuth } from "../../context/AuthContext";
+import { useRouter } from "next/router";
+export default function dashboard() {
+  const user = thisUser();
+  
+  const { logout } = useAuth();
+  const router = useRouter();
 
-export default function dashboard({ user = "Juan Dela Cruz" }) {
+  const logoutStudent = () => {
+    logout();
+    router.push("/");
+  };
+
   return (
     <div className="p-12 md:px-24 pt-8">
       <div className="flex py-2 flex-row justify-between mt-6 mb-10">
@@ -12,11 +24,15 @@ export default function dashboard({ user = "Juan Dela Cruz" }) {
             <FontAwesomeIcon icon={faFaceSmile} />
           </div>
           <div className="">
-            <p className="text-2xl font-bold uppercase">Hello, {user}!</p>
+            <p className="text-2xl font-bold uppercase">
+              Hello, {user.firstName}!
+            </p>
             <p className="text-l">Welcome to CORA.</p>
           </div>
         </div>
-        <button className="flex align-start underline">Logout</button>
+        <button onClick={logoutStudent} className="flex align-start underline">
+          Logout
+        </button>
       </div>
       {/* Main Content */}
       <div className="w-full flex flex-col md:flex-row gap-8 lg:gap-32 px-4 justify-center mt-16">

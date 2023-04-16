@@ -3,13 +3,18 @@ import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
+import { thisUser } from "@/context/UserContext";
+import { useRouter } from "next/router";
 
-export default function Login({ userCred }) {
+export default function Login({ userType }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(true);
+
+  const router = useRouter();
+  const user = thisUser();
 
   const { login, signup, currentUser } = useAuth();
   console.log(currentUser);
@@ -24,10 +29,18 @@ export default function Login({ userCred }) {
     }
     if (isLoggingIn) {
       try {
-        await login(email, password);
+        const res = await login(email, password);
+
+        console.log("Login res", res);
+        if (userType == "teacher") {
+          router.push("/teacher/dashboard");
+        } else {
+          router.push("/student/dashboard");
+        }
       } catch (err) {
         setError("Incorrect email or password.");
       }
+
       return;
     }
     // Will signup the user and store the user in credentials variable
@@ -36,7 +49,7 @@ export default function Login({ userCred }) {
     // Based on the userCred (teacher or student), the new user will be
     // added to its corresponding collection (teachers or students) in
     // the database (Firestore)
-    if (userCred == "teacher") {
+    if (userType == "teacher") {
       try {
         const docRef = await addDoc(collection(db, "teachers"), {
           email: credentials.user.email,
@@ -78,7 +91,7 @@ export default function Login({ userCred }) {
           </div>
           {!isLoggingIn && (
             <input
-              className="w-full px-4 py-2 mt-6 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+              className="w-full px-4 py-2 mt-6 border border-gray-400 rounded focus:outline-none focus:ring-1 npfocus:ring-blue-600"
               value={name}
               onChange={(e) => setName(e.target.value)}
               type="text"
@@ -90,14 +103,14 @@ export default function Login({ userCred }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             type="email"
-            placeholder={userCred}
+            placeholder={"Enter Email"}
           />
           <input
             className="w-full px-4 py-2 mt-8 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
-            placeholder="Password"
+            placeholder="Enter Password"
           />
           <div className="flex flex-col items-center justify-center gap-2">
             <button
