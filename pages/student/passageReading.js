@@ -6,15 +6,14 @@ import {
   faCircle,
   faChevronRight,
   faSquare,
-  faCheckCircle,
-  faCheckSquare,
   faCheck,
 } from "@fortawesome/free-solid-svg-icons";
+import { thisUser } from "@/context/UserContext";
+import { Text } from "@nextui-org/react";
 
-export default function passageReading({
-  title = "Liquids Good For You",
-  text = "There are many liquids that are good for our health like water, fruit juice, and milk. Milk makes our bones strong. Juice gives us vitamins, while water cleans our body. Let's drink milk, juice, and water to make us healthy.",
-}) {
+export default function passageReading() {
+  const user = thisUser();
+
   const [isRecording, setIsRecording] = useState(false);
   const [isRecordingCompleted, setIsRecordingCompleted] = useState(false);
   return (
@@ -23,10 +22,10 @@ export default function passageReading({
       <div className="p-12 md:px-16 pt-8">
         <BackButton />
         <div className="flex flex-col flex-1  text-center py-20 px-8 md:px-20 lg:px-60 gap-12">
-          <h1 className="font-bold text-6xl">{title}</h1>
-          <p className="text-justify indent-12 text-3xl leading-loose">
-            {text}
-          </p>
+          <h1 className="font-bold text-6xl">{user.passage.title}</h1>
+          <div className="text-justify indent-12 text-3xl leading-loose">
+            {user.passage.text}
+          </div>
         </div>
       </div>
       {/* Footer  */}

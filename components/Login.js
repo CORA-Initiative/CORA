@@ -22,6 +22,10 @@ export default function Login({ userType }) {
   // will toggle the type of entry (i.e., login or register)
   const toggleEntry = () => setIsLoggingIn(!isLoggingIn);
 
+  function getStudentData() {
+    // TODO: Retrieve student info + pretest, posttest scores
+  }
+
   async function submitHandler() {
     if (!email || !password) {
       setError("Please enter valid credentials.");
@@ -30,11 +34,13 @@ export default function Login({ userType }) {
     if (isLoggingIn) {
       try {
         const res = await login(email, password);
-
         console.log("Login res", res);
+
         if (userType == "teacher") {
           router.push("/teacher/dashboard");
         } else {
+          // TODO: get student info + pretest, posttest scores
+
           router.push("/student/dashboard");
         }
       } catch (err) {

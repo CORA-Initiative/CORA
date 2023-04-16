@@ -5,9 +5,10 @@ import { faFaceSmile } from "@fortawesome/free-solid-svg-icons";
 import { thisUser } from "@/context/UserContext";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/router";
+
 export default function dashboard() {
   const user = thisUser();
-  
+
   const { logout } = useAuth();
   const router = useRouter();
 
@@ -25,7 +26,7 @@ export default function dashboard() {
           </div>
           <div className="">
             <p className="text-2xl font-bold uppercase">
-              Hello, {user.firstName}!
+              Hello, {user.firstName} {user.lastName}!
             </p>
             <p className="text-l">Welcome to CORA.</p>
           </div>
@@ -38,15 +39,16 @@ export default function dashboard() {
       <div className="w-full flex flex-col md:flex-row gap-8 lg:gap-32 px-4 justify-center mt-16">
         <ReadingProfileSummary
           test_type="Pre-test"
-          word_reading_score={35}
-          comprehension_score={25}
-          reading_rate={45}
+          word_reading_score={user.preTestScores.word_reading_score}
+          comprehension_score={user.preTestScores.comprehension_score}
+          reading_rate={user.preTestScores.reading_rate}
+          disableTakeTest={false}
         ></ReadingProfileSummary>
         <ReadingProfileSummary
           test_type="Post-test"
-          word_reading_score={45}
-          comprehension_score={35}
-          reading_rate={55}
+          word_reading_score={user.postTestScores.word_reading_score}
+          comprehension_score={user.postTestScores.comprehension_score}
+          reading_rate={user.postTestScores.reading_rate}
           disableTakeTest={true}
         ></ReadingProfileSummary>
       </div>
