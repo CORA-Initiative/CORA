@@ -9,13 +9,32 @@ import {
   faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import { thisUser } from "@/context/UserContext";
-import { Text } from "@nextui-org/react";
+import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
 
 export default function passageReading() {
   const user = thisUser();
 
   const [isRecording, setIsRecording] = useState(false);
   const [isRecordingCompleted, setIsRecordingCompleted] = useState(false);
+
+  const recorderControls = useAudioRecorder();
+
+  const getAudioFile = (blob) => {
+    const url = URL.createObjectURL(blob);
+    const audio = document.createElement("audio");
+
+    console.log("url", url);
+    console.log("audio", audio);
+
+    const audioFile = new Audio(url);
+    console.log("audioFile", audioFile);
+
+    audio.src = url;
+    audio.controls = true;
+
+    setIsRecordingCompleted(true);
+  };
+
   return (
     <div className="flex flex-col justify-between h-full">
       {/* Text */}
@@ -28,10 +47,16 @@ export default function passageReading() {
           </div>
         </div>
       </div>
+
       {/* Footer  */}
-      <div className="flex flex-row bg-coraBlue-3 justify-between items-center fixed bottom-0 p-2 w-full">
+      <div className="flex flex-row bg-coraBlue-3 justify-between items-center fixed bottom-0 p-4 w-full">
+        <AudioRecorder
+          onRecordingComplete={(blob) => getAudioFile(blob)}
+          recorderControls={recorderControls}
+        ></AudioRecorder>
+
         {/* Recording indicator */}
-        <div
+        {/* <div
           className={`flex flex-row items-center gap-2 ${
             isRecording && !isRecordingCompleted ? "visible" : "invisible"
           }`}
@@ -45,17 +70,24 @@ export default function passageReading() {
         {!isRecording && (
           <button
             className="flex flex-col hover:text-gray-800 text-md"
-            onClick={() => setIsRecording(true)}
+            onClick={() => {
+              setIsRecording(true);
+              recorderControls.startRecording;
+              console.log("Start recording.");
+            }}
           >
             <FontAwesomeIcon icon={faCircle} color="#FB3C3C" size="2xl" />
             Start Recording
           </button>
         )}
+
         {isRecording && !isRecordingCompleted && (
           <button
             className="flex flex-col hover:text-gray-800 text-md"
-            onClick={() => {
+            onClick={(e) => {
               setIsRecordingCompleted(true);
+              recorderControls.stopRecording;
+              console.log("Stop recording.");
             }}
           >
             <FontAwesomeIcon icon={faSquare} size="2xl" />
@@ -67,17 +99,16 @@ export default function passageReading() {
             <FontAwesomeIcon icon={faCheck} color="green" size="2xl" />
             Reading Recording Saved
           </div>
-        )}
+        )} */}
 
         {/* Take quiz button */}
-
         <Link href="/student/takeQuiz">
           <button
-            className={`flex flex-row items-center gap-2 ${
+            className={`flex flex-row items-center gap-2 bg-white px-4 py-2 font-bold border-1 rounded-md shadow-sm ${
               isRecordingCompleted ? "visible" : "invisible"
             }`}
           >
-            <p className="underline text-lg">Take Quiz</p>
+            <p className="text-lg">Take Quiz</p>
             <FontAwesomeIcon icon={faChevronRight} size="sm" />
           </button>
         </Link>
