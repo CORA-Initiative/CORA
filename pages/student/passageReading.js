@@ -1,23 +1,44 @@
-import { React, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import BackButton from "@/components/BackButton";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircle,
-  faChevronRight,
-  faSquare,
-  faCheck,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { thisUser } from "@/context/UserContext";
 import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
+import { db } from "../../firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 export default function passageReading() {
   const user = thisUser();
 
   const [isRecording, setIsRecording] = useState(false);
   const [isRecordingCompleted, setIsRecordingCompleted] = useState(false);
+  const [title, setTitle] = useState();
+  const [text, setText] = useState();
 
   const recorderControls = useAudioRecorder();
+
+  const fetchPassageTitleAndText = async () => {
+    console.log("In fetchPassageTitleAndText()");
+    // TODO: fetch passage
+    // TODO: get ID of the passage, and display title + text
+    // param: passage id
+    console.log("Passage ID", sessionStorage.getItem("passage_id"));
+    const passageRef = collection(db, "passage"); // Create a reference to the cities collection
+    const passageQuery = query(
+      passageRef,
+      where("id", "==", Number(sessionStorage.getItem("passage_id")))
+    );
+
+    const passageQuerySnapshot = await getDocs(passageQuery);
+
+    passageQuerySnapshot.forEach((doc) => {
+      let passage = doc.data();
+      console.log("Passage", passage);
+      setTitle(passage.title);
+      setText(passage.text);
+    });
+  };
 
   const getAudioFile = (blob) => {
     const url = URL.createObjectURL(blob);
@@ -35,15 +56,23 @@ export default function passageReading() {
     setIsRecordingCompleted(true);
   };
 
+  // useLayoutEffect(() => {
+  //   fetchPassageTitleAndText();
+  // });
+  useEffect(() => {
+    fetchPassageTitleAndText();
+  }),
+    [];
+
   return (
     <div className="flex flex-col justify-between h-full">
       {/* Text */}
       <div className="p-12 md:px-16 pt-8">
         <BackButton />
         <div className="flex flex-col flex-1  text-center py-20 px-8 md:px-20 lg:px-60 gap-12">
-          <h1 className="font-bold text-6xl">{user.passage.title}</h1>
+          <h1 className="font-bold text-6xl">{title}</h1>
           <div className="text-justify indent-12 text-3xl leading-loose">
-            {user.passage.text}
+            {text}
           </div>
         </div>
       </div>

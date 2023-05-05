@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { thisUser } from "@/context/UserContext";
 import { useRouter } from "next/router";
 
@@ -14,17 +14,13 @@ export default function Login({ userType }) {
   const [isLoggingIn, setIsLoggingIn] = useState(true);
 
   const router = useRouter();
-  const user = thisUser();
+  const { setUserID, setTeacherID, setStudentID, setUserType } = thisUser();
 
   const { login, signup, currentUser } = useAuth();
   console.log(currentUser);
 
   // will toggle the type of entry (i.e., login or register)
   const toggleEntry = () => setIsLoggingIn(!isLoggingIn);
-
-  function getStudentData() {
-    // TODO: Retrieve student info + pretest, posttest scores
-  }
 
   async function submitHandler() {
     if (!email || !password) {
@@ -34,13 +30,17 @@ export default function Login({ userType }) {
     if (isLoggingIn) {
       try {
         const res = await login(email, password);
-        console.log("Login res", res);
+        setUserID(email);
+        console.log("Email", email);
 
         if (userType == "teacher") {
+          sessionStorage.setItem("userType", "teacher");
+          sessionStorage.setItem("userID", email);
           router.push("/teacher/dashboard");
         } else {
-          // TODO: get student info + pretest, posttest scores
-
+          setUserType("student");
+          sessionStorage.setItem("userType", "student");
+          sessionStorage.setItem("userID", email);
           router.push("/student/dashboard");
         }
       } catch (err) {
