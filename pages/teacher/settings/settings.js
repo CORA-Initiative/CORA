@@ -14,6 +14,10 @@ export default function Settings() {
   const title = "Teacher Settings";
   const router = useRouter();
 
+  const logoutTeacher = () => {
+    logout();
+    router.push("/");
+  };
   return (
     <div className="p-12 md:px-24 pt-8">
       <div className="flex flex-row flex-start gap-1">
@@ -27,7 +31,10 @@ export default function Settings() {
         </div>
         {/* Logout Button */}
         <div className="">
-          <button className="px-10 py-1 text-white font-bold text-lg bg-coraBlue-1 rounded hover:bg-coraBlue-4">
+          <button
+            onClick={logoutTeacher}
+            className="px-10 py-1 text-white font-bold text-lg bg-coraBlue-1 rounded hover:bg-coraBlue-4"
+          >
             Logout
           </button>
         </div>

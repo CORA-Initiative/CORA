@@ -1,16 +1,12 @@
-import Link from "next/link";
 import Login from "@/components/Login";
-import Dashboard from "@/components/Dashboard";
 import { useAuth } from "@/context/AuthContext";
+import { thisUser } from "@/context/UserContext";
+import { useRouter } from "next/router";
 
 export default function StudentLogin() {
   const { currentUser } = useAuth();
-  console.log(currentUser);
+  const user = thisUser();
+  const router = useRouter();
 
-  return (
-    <>
-      {!currentUser && <Login userCred={"Student ID"} />}
-      {currentUser && <Dashboard />}
-    </>
-  );
+  return <>{!user.userID && <Login userType={"student"} />}</>;
 }

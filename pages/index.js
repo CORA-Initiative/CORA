@@ -1,7 +1,9 @@
 import Head from "next/head";
-import Image from "next/image";
 import { Inter } from "@next/font/google";
 import { useAuth } from "../context/AuthContext";
+import { useContext } from "react";
+import { useRouter } from "next/router";
+import { UserContext, thisUser } from "../context/UserContext";
 
 const inter = Inter({ subsets: ["latin"] });
 

@@ -11,7 +11,7 @@ export default function quizResults({
   return (
     <div className="flex flex-col p-12 md:px-16 pt-8 gap-6">
       {/* Back button */}
-      <BackButton />
+      {/* <BackButton /> */}
 
       <div className="flex flex-col gap-24">
         <div className="flex flex-col text-center gap-2">

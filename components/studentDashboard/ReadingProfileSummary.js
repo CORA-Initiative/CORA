@@ -9,17 +9,18 @@ import {
 import Link from "next/link";
 
 export default function ReadingProfileSummary({
-  test_type = "Test",
-  word_reading_score,
+  test_type = "",
+  reading_score,
   comprehension_score,
   reading_rate,
-  disableTakeTest = false,
+  enableTakeTest = false,
 }) {
-  const wrs_width = word_reading_score.toString() + "%";
+  const wrs_width = reading_score.toString() + "%";
   const cs_width = comprehension_score.toString() + "%";
   return (
     <div className="flex flex-col text-center border border-coraBlue-2 pt-8 gap-8 rounded-2xl overflow-hidden ">
       <h3 className="font-bold text-2xl">Your {test_type} Profile</h3>
+
       <div className="flex flex-col text-center gap-10 mx-12">
         {/* Reading Profile Summaries */}
         {/* Word Reading Score */}
@@ -28,7 +29,7 @@ export default function ReadingProfileSummary({
             <FontAwesomeIcon icon={faBook} />
           </div>
           <div className="text-left w-full">
-            <h4 className="font-bold text-gray-800">Word Reading Score</h4>
+            <h4 className="font-bold text-gray-800">Reading Score</h4>
             <div className="border border-gray-400">
               <div
                 className="text-white bg-gray-400 p-2 text-right text-xs"
@@ -73,7 +74,8 @@ export default function ReadingProfileSummary({
       </div>
       <Link href="/student/passageTitle">
         <button
-          disabled={disableTakeTest}
+          onClick={sessionStorage.setItem("test_type", test_type)}
+          disabled={!enableTakeTest}
           className="mt-4 bg-coraBlue-1 p-4 text-white font-bold text-xl disabled:opacity-50 w-full"
         >
           Take {test_type}
