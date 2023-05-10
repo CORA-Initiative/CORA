@@ -1,11 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBook,
-  faNotes,
-  faClock,
-  faFilePen,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBook, faClock, faFilePen } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
 export default function ReadingProfileSummary({
@@ -17,6 +12,7 @@ export default function ReadingProfileSummary({
 }) {
   const wrs_width = reading_score.toString() + "%";
   const cs_width = comprehension_score.toString() + "%";
+
   return (
     <div className="flex flex-col text-center border border-coraBlue-2 pt-8 gap-8 rounded-2xl overflow-hidden ">
       <h3 className="font-bold text-2xl">Your {test_type} Profile</h3>
@@ -74,7 +70,10 @@ export default function ReadingProfileSummary({
       </div>
       <Link href="/student/passageTitle">
         <button
-          onClick={sessionStorage.setItem("test_type", test_type)}
+          onClick={() => {
+            sessionStorage.setItem("test_type", test_type);
+            console.log(sessionStorage.getItem("test_type"));
+          }}
           disabled={!enableTakeTest}
           className="mt-4 bg-coraBlue-1 p-4 text-white font-bold text-xl disabled:opacity-50 w-full"
         >
