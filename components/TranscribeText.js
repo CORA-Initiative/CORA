@@ -3,7 +3,7 @@ const { Readable } = require("stream");
 
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
-    apiKey: "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",
+    apiKey: "",
 });
 
 // Function to transcribe the text from audio
