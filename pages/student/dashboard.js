@@ -12,13 +12,13 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 export default function dashboard() {
   const router = useRouter();
   const { logout } = useAuth();
-  const user = thisUser();
-
-  const [studentID, setStudentID] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [handlerID, setHandlerID] = useState("");
 
-  // TODO: Retrieve student info + pretest, posttest scores
+  const [isPretestEnabled, setIsPretestEnabled] = useState("");
+  const [isPosttestEnabled, setIsPosttestEnabled] = useState("");
+
   // Get student Pre-test and post-test data
   const [preTestScores, setPreTestScores] = useState({
     reading_score: 0,
@@ -31,53 +31,64 @@ export default function dashboard() {
     reading_rate: 0,
   });
 
+  // DATA RETRIEVERS
   const getStudentData = async () => {
+    // Get student data from db
     const studentsRef = collection(db, "students");
-    const studentsQuery = query(studentsRef, where("email", "==", studentID));
-
-    const querySnapshot = await getDocs(studentsQuery);
-    querySnapshot.forEach((doc) => {
-      console.log("In students querySnapshot");
-
-      let data = doc.data();
-
-      setFirstName(data.first_name);
-      setLastName(data.last_name);
-      sessionStorage.setItem("grade_level", data.grade_level);
-      console.log("Grade level", sessionStorage.getItem("grade_level"));
-    });
-
-    // TODO: Get passage by grade level and type
-    const passageRef = collection(db, "passage");
-    const passageQuery = query(
-      passageRef,
-      where("grade_level", "==", sessionStorage.getItem("grade_level"))
+    const studentsQuery = query(
+      studentsRef,
+      where("email", "==", sessionStorage.getItem("student_id"))
     );
-    const passageSnapshot = await getDocs(passageQuery);
-    passageSnapshot.forEach((doc) => {
-      let passage = doc.data();
+    const querySnapshot = await getDocs(studentsQuery);
 
-      console.log("Passage", passage);
-      sessionStorage.setItem("passage_id", passage.id);
+    querySnapshot.forEach((doc) => {
+      let student = doc.data();
+      console.log("In students querySnapshot: ", student);
+
+      setFirstName(student.first_name);
+      setLastName(student.last_name);
+      sessionStorage.setItem("grade_level", student.grade_level);
+      sessionStorage.setItem("handler_id", student.teacher_id);
     });
   };
 
-  const getPreTestData = async () => {
-    console.log("In getTestsData()");
+  // Set test type availability
+  const setTestsAvailability = async () => {
+    // Get teacher, check if pretest and posttest are enabled
+    const teacherRef = collection(db, "teachers");
+    const teacherQuery = query(
+      teacherRef,
+      where("email", "==", sessionStorage.getItem("handler_id"))
+    );
+    const teacherSnapshot = await getDocs(teacherQuery);
+
+    teacherSnapshot.forEach((doc) => {
+      let teacher = doc.data();
+
+      console.log("teacher:", teacher);
+      setIsPretestEnabled(teacher.isPretestEnabled);
+      setIsPosttestEnabled(teacher.isPosttestEnabled);
+    });
+  };
+
+  // Get pre-test data of student
+  const getPretestData = async () => {
+    console.log(">>> getPretestData()");
+
+    console.log("student_id: ", sessionStorage.getItem("student_id"));
 
     const pretestRef = collection(db, "pre-test");
     const pretestQuery = query(
       pretestRef,
-      where("student_id", "==", studentID)
-    ); // Create a query against the collection.
+      where("student_id", "==", sessionStorage.getItem("student_id"))
+    );
+    const pretestQuerySnapshot = await getDocs(pretestQuery);
 
-    const querySnapshot = await getDocs(pretestQuery);
-    querySnapshot.forEach((doc) => {
-      console.log("In querySnapshot");
-
+    pretestQuerySnapshot.forEach((doc) => {
       let pretestData = doc.data();
 
-      if (pretestData.student_id === studentID) {
+      console.log("Pretest", pretestData);
+      if (pretestData.student_id === sessionStorage.getItem("student_id")) {
         setPreTestScores((prevScores) => ({
           ...prevScores,
           reading_score: pretestData.reading_score_percentage,
@@ -88,21 +99,21 @@ export default function dashboard() {
     });
   };
 
-  const getPostTestData = async () => {
-    const posttestRef = collection(db, "post-test"); // Create a reference to the cities collection
+  // Get posttest data of student
+  const getPosttestData = async () => {
+    console.log(">>> getPosttestData()");
+
+    const posttestRef = collection(db, "post-test");
     const posttestQuery = query(
       posttestRef,
-      where("student_id", "==", studentID)
+      where("student_id", "==", sessionStorage.getItem("student_id"))
     );
-
     const postTestQuerySnapshot = await getDocs(posttestQuery);
 
     postTestQuerySnapshot.forEach((doc) => {
       let posttestData = doc.data();
 
-      console.log(posttestData);
-      console.log("Posttest", posttestData.student_id, studentID);
-      if (posttestData.student_id === studentID) {
+      if (posttestData.student_id === sessionStorage.getItem("student_id")) {
         setPostTestScores((prevScores) => ({
           ...prevScores,
           reading_score: posttestData.reading_score_percentage,
@@ -112,27 +123,28 @@ export default function dashboard() {
       }
     });
   };
+
+  // FUNCTIONS
   const logoutStudent = () => {
     logout();
     router.push("/");
   };
 
-  useLayoutEffect(() => {
-    if (sessionStorage.getItem("userID")) {
-      setStudentID(sessionStorage.getItem("userID"));
-      getStudentData();
-      getPreTestData();
-      getPostTestData();
-    } else {
-      sessionStorage.setItem("state", "ABC");
-      const cookie = sessionStorage.getItem("state");
-      console.log(cookie);
-    }
-  }, [studentID, firstName, lastName]);
-
   useEffect(() => {
-    getStudentData();
-  }, []);
+    // A student ID must exist in sessionStorage i.e. email
+    if (sessionStorage.getItem("student_id")) {
+      // Get student data
+      getStudentData();
+      setTestsAvailability();
+
+      // And get pretest and posttest data if available
+      getPretestData();
+      getPosttestData();
+    } else {
+      console.log("Unable to identify the student.");
+      router.push("/");
+    }
+  }, [handlerID]);
 
   return (
     <div className="p-12 md:px-24 pt-8">
@@ -152,6 +164,7 @@ export default function dashboard() {
           Logout
         </button>
       </div>
+
       {/* Main Content */}
       <div className="w-full flex flex-col md:flex-row gap-8 lg:gap-32 px-4 justify-center mt-16">
         <ReadingProfileSummary
@@ -159,14 +172,16 @@ export default function dashboard() {
           reading_score={preTestScores.reading_score}
           comprehension_score={preTestScores.comprehension_score}
           reading_rate={preTestScores.reading_rate}
-          enableTakeTest={user.isPretestEnabled}
+          enableTakeTest={isPretestEnabled && preTestScores.reading_rate === 0}
         ></ReadingProfileSummary>
         <ReadingProfileSummary
-          test_type="Post-test"
+          test_type="Post test"
           reading_score={postTestScores.reading_score}
           comprehension_score={postTestScores.comprehension_score}
           reading_rate={postTestScores.reading_rate}
-          enableTakeTest={user.isPosttestEnabled}
+          enableTakeTest={
+            isPosttestEnabled && postTestScores.reading_rate === 0
+          }
         ></ReadingProfileSummary>
       </div>
     </div>

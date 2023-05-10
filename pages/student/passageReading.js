@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import BackButton from "@/components/BackButton";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -6,7 +6,14 @@ import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { thisUser } from "@/context/UserContext";
 import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
 import { db } from "../../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  doc,
+} from "firebase/firestore";
 
 export default function passageReading() {
   const user = thisUser();
@@ -20,24 +27,19 @@ export default function passageReading() {
 
   const fetchPassageTitleAndText = async () => {
     console.log("In fetchPassageTitleAndText()");
-    // TODO: fetch passage
-    // TODO: get ID of the passage, and display title + text
-    // param: passage id
-    console.log("Passage ID", sessionStorage.getItem("passage_id"));
-    const passageRef = collection(db, "passage"); // Create a reference to the cities collection
-    const passageQuery = query(
-      passageRef,
-      where("id", "==", Number(sessionStorage.getItem("passage_id")))
-    );
 
-    const passageQuerySnapshot = await getDocs(passageQuery);
+    // console.log("Passage ID", sessionStorage.getItem("passage_id"));
+    const passageRef = doc(db, "passage", sessionStorage.getItem("passage_id"));
+    const passageSnap = await getDoc(passageRef);
 
-    passageQuerySnapshot.forEach((doc) => {
-      let passage = doc.data();
-      console.log("Passage", passage);
+    if (passageSnap.exists()) {
+      let passage = passageSnap.data();
+
       setTitle(passage.title);
       setText(passage.text);
-    });
+    } else {
+      console.log("Failed to fetch passage.");
+    }
   };
 
   const getAudioFile = (blob) => {
@@ -56,9 +58,6 @@ export default function passageReading() {
     setIsRecordingCompleted(true);
   };
 
-  // useLayoutEffect(() => {
-  //   fetchPassageTitleAndText();
-  // });
   useEffect(() => {
     fetchPassageTitleAndText();
   }),

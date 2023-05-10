@@ -30,17 +30,14 @@ export default function Login({ userType }) {
     if (isLoggingIn) {
       try {
         const res = await login(email, password);
-        setUserID(email);
-        console.log("Email", email);
 
         if (userType == "teacher") {
-          sessionStorage.setItem("userType", "teacher");
-          sessionStorage.setItem("userID", email);
+          sessionStorage.setItem("user_type", "teacher");
+          sessionStorage.setItem("teacher_id", email);
           router.push("/teacher/dashboard");
         } else {
-          setUserType("student");
-          sessionStorage.setItem("userType", "student");
-          sessionStorage.setItem("userID", email);
+          sessionStorage.setItem("user_type", "student");
+          sessionStorage.setItem("student_id", email);
           router.push("/student/dashboard");
         }
       } catch (err) {
@@ -118,23 +115,23 @@ export default function Login({ userType }) {
             type="password"
             placeholder="Enter Password"
           />
-          <div className="flex flex-col items-center justify-center gap-2">
+          <div className="flex flex-col items-center justify-center gap-16">
             <button
               className="px-10 py-1 mt-20 text-white font-bold text-lg bg-blue-600 rounded hover:bg-blue-900"
               onClick={submitHandler}
             >
               {isLoggingIn ? "Login" : "Register"}
             </button>
-            <div
+            {/* <div
               className="text-xs text-center mt-4 w-40 cursor-pointer"
               onClick={toggleEntry}
             >
               {isLoggingIn
                 ? "Don't have an account yet? Sign up here."
                 : "Already have an account? Log in here."}
-            </div>
-            <div></div>
-            <h3>
+            </div> */}
+
+            <h3 className="">
               <Link href="/">Home</Link>
             </h3>
           </div>

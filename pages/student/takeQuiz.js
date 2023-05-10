@@ -1,12 +1,13 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import BackButton from "@/components/BackButton";
+import React, { useEffect, useState } from "react";
 import { thisUser } from "@/context/UserContext";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase";
+import { useRouter } from "next/router";
 
 export default function takeQuiz({}) {
   const user = thisUser();
 
+  const router = useRouter();
   const [text, setText] = useState();
   const [quiz, setQuiz] = useState([
     { question: "What", choices: ["a", "b", "c"], answer_key: "a" },
@@ -25,23 +26,22 @@ export default function takeQuiz({}) {
     });
   };
 
-  const [testType, setTestType] = useState();
   const [title, setTitle] = useState();
 
   const getPassage = async () => {
-    const passageRef = collection(db, "passage");
+    // console.log("Passage ID", sessionStorage.getItem("passage_id"));
+    const passageRef = doc(db, "passage", sessionStorage.getItem("passage_id"));
+    const passageSnap = await getDoc(passageRef);
 
-    // TODO: Change id to dynamic passageID
-    const passageQuery = query(passageRef, where("id", "==", 1243));
+    if (passageSnap.exists()) {
+      let passage = passageSnap.data();
 
-    const passageQuerySnapshot = await getDocs(passageQuery);
-
-    passageQuerySnapshot.forEach((doc) => {
-      let passage = doc.data();
       setTitle(passage.title);
       setQuiz(passage.quiz);
       setText(passage.text);
-    });
+    } else {
+      console.log("Failed to fetch passage.");
+    }
   };
 
   const evaluateOverallReadingProfile = () => {
@@ -108,33 +108,36 @@ export default function takeQuiz({}) {
     return overallReadingProfile;
   };
 
-  const addPretestFile = async () => {
+  const addTestResultsToDatabase = async (collection_name = "") => {
     try {
-      // TODO: Modify db to write on: pre=test or post
-      const docRef = await addDoc(collection(db, "pre-test"), {
+      const docRef = await addDoc(collection(db, collection_name), {
         passage_title: title,
+        passage_id: sessionStorage.getItem("passage_id"),
         student_id: sessionStorage.getItem("student_id"),
-        reading_speed: 0,
-        quiz_score: sessionStorage.getItem("quiz_score"),
-        number_of_miscues: 3,
+        reading_speed: Number(sessionStorage.getItem("reading_speed")),
+        quiz_score: Number(sessionStorage.getItem("quiz_score")),
+        number_of_miscues: Number(sessionStorage.getItem("number_of_miscues")),
         reading_score_percentage:
-          Math.round((totalWords - numberOfMiscues) / totalWords) * 100,
+          ((sessionStorage.getItem("total_words") -
+            sessionStorage.getItem("number_of_miscues")) /
+            sessionStorage.getItem("total_words")) *
+          100,
         comprehension_score_percentage:
-          Math.round(
-            sessionStorage.getItem("quiz_score") /
-              sessionStorage.getItem("total_quiz_items")
-          ) * 100,
+          (sessionStorage.getItem("quiz_score") /
+            sessionStorage.getItem("total_quiz_items")) *
+          100,
         oral_reading_profile: evaluateOverallReadingProfile(),
-        teacher_id: "",
+        handler_id: sessionStorage.getItem("handler_id"),
         date_taken: new Date(),
-
-        id: "",
+        answers: answers,
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
   };
+
+  // Check quiz answers
   const checkQuizAnswers = () => {
     const answerKeys = quiz.map((item) => item.answer_key);
 
@@ -157,24 +160,31 @@ export default function takeQuiz({}) {
     sessionStorage.setItem("total_quiz_items", totalQuizItems);
 
     // TODO: Save answers and score to database
-    addPretestFile();
+    let c_name = "";
+    if (sessionStorage.getItem("test_type") == "Pre-test") {
+      c_name = "pre-test";
+    } else {
+      c_name = "post-test";
+    }
+
+    addTestResultsToDatabase(c_name);
 
     return;
   };
-  // useLayoutEffect(() => {
-  //   getPassageQuiz();
-  // });
+
   useEffect(() => {
     getPassage();
+    sessionStorage.setItem("number_of_miscues", 3);
+    sessionStorage.setItem("reading_speed", 40);
+    sessionStorage.setItem("total_words", 50);
   }, []);
 
   return (
     <div className="flex flex-col p-12 md:px-16 pt-8 gap-2 my-4">
-      {/* Back button */}
-      {/* <BackButton /> */}
-
       <div className="flex flex-col text-center gap-2 p-2 mx-4 md:mx-12 lg:mx-40 border-b-4 border-coraBlue-1">
-        <h2 className="text-3xl font-bold">{testType} Quiz</h2>
+        <h2 className="text-3xl font-bold">
+          {sessionStorage.getItem("test_type")} Quiz
+        </h2>
         <p className="text-lg">{title}</p>
       </div>
 
@@ -184,11 +194,11 @@ export default function takeQuiz({}) {
           {quiz.map((item, index) => {
             return (
               // Single question
-              <div className="flex flex-col bg-gray-100 rounded-lg p-6">
+              <div className="flex flex-col bg-gray-100 rounded-lg p-6 border-b-4">
                 <p className="text-xl font-bold">
                   {index + 1}. {item.question}
                 </p>
-                {/* {(choices = item.choices)} */}
+
                 <div className="flex flex-col gap-2">
                   {item.choices.map((choice) => {
                     return (
@@ -226,6 +236,7 @@ export default function takeQuiz({}) {
             console.log("Stuent ID", sessionStorage.getItem("student_id"));
             console.log(sessionStorage.getItem("passage_id"));
             checkQuizAnswers();
+            router.push("/student/quizResults");
           }}
         >
           SUBMIT
