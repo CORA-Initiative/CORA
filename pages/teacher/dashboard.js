@@ -1,18 +1,112 @@
 import Container from "@/components/Container";
 import Toggle from "../../components/toggle/Toggle";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import SearchBox from "@/components/searchBox/SearchBox";
-// import "tw-elements";
+import { faGear, faMound, faUser } from "@fortawesome/free-solid-svg-icons";
+import SearchBox from "@/components/SearchBox/SearchBox";
 import Link from "next/link";
+import { db } from "../../firebase";
+import {
+  collection,
+  query,
+  where,
+  getDoc,
+  doc,
+  getDocs,
+} from "firebase/firestore";
+import { useRouter } from "next/router";
 
 export default function dashboard() {
-  const user = "Jose Andres M. Luna";
-  const role = "Teacher";
-  const school = "Miagao Elementary School";
-  const year = 2023;
+  // Teacher details
+  const [name, setName] = useState();
+  const [role, setRole] = useState();
+  const [isPretestEnabled, setIsPretestEnabled] = useState();
+  const [isPosttestEnabled, setIsPosttestEnabled] = useState();
+
+  // Get school details
+  const [school, setSchool] = useState("");
+  const [schoolYear, setSchoolYear] = useState("20xx-20xx");
+
+  const [sections, setSections] = useState([]);
 
   const results = true;
+  const [searchStudents, setSearchStudents] = useState([]);
+  const [searchSections, setSearchSections] = useState([]);
+
+  const [pretestProfileCounts, setPretestProfileCounts] = useState({
+    frustation: 0,
+    instructional,
+  });
+  const router = useRouter();
+
+  // DATA RETRIEVERS
+  const getSchoolData = async (schoolRefID) => {};
+
+  const getTeacherAndSchoolData = async () => {
+    const teachersRef = collection(db, "teachers");
+    const teachersQuery = query(
+      teachersRef,
+      where("email", "==", sessionStorage.getItem("teacher_id"))
+    );
+    const teacherSnapshot = await getDocs(teachersQuery);
+
+    let schoolRefID = "";
+    teacherSnapshot.forEach((doc) => {
+      let teacher = doc.data();
+
+      setName(teacher.first_name + " " + teacher.last_name);
+      setRole("Teacher");
+      setIsPretestEnabled(teacher.isPretestEnabled);
+      setIsPosttestEnabled(teacher.isPosttestEnabled);
+
+      schoolRefID = teacher.school_id;
+    });
+
+    const schoolRef = doc(db, "school", schoolRefID);
+    try {
+      const schoolSnap = await getDoc(schoolRef);
+
+      if (schoolSnap.exists()) {
+        let school = schoolSnap.data();
+
+        console.log(school);
+        sessionStorage.setItem("school_region", String(school.region));
+        sessionStorage.setItem("school_name", school.name);
+        setSchool(school.name);
+        setSchoolYear(school.school_year);
+      } else {
+        console.log("No document found.");
+      }
+    } catch (e) {
+      console.log("Error getting school document.");
+    }
+  };
+
+  const getSectionsData = async () => {
+    // TODO: Get all sections handled by the teacher
+    const sectionsRef = collection(db, "section");
+    const sectionsQuery = query(
+      sectionsRef,
+      where("teacher_id", "==", sessionStorage.getItem("teacher_id"))
+    );
+    const sectionsSnap = await getDocs(sectionsQuery);
+
+    if (sectionsSnap) {
+      setSections(sectionsSnap.docs);
+    } else {
+      console.log("No section document found.");
+    }
+  };
+
+  const totalTookPretest = async () => {};
+
+  const totalTookPosttest = async () => {};
+
+  useEffect(() => {
+    getTeacherAndSchoolData();
+
+    getSectionsData();
+  }, []);
 
   return (
     <div className="p-12 pt-4">
@@ -23,9 +117,9 @@ export default function dashboard() {
           </div>
 
           <div className="">
-            <p className="text-2xl font-bold">{user}</p>
+            <p className="text-2xl font-bold">{name}</p>
             <p className="text-l">
-              {role}, {school}, SY {year}-{year + 1}
+              {role}, {school}, SY {schoolYear}
             </p>
           </div>
         </div>
@@ -62,25 +156,41 @@ export default function dashboard() {
 
           {results && (
             <tbody>
-              <tr>
-                <td>2</td>
-                <td>Sampaguita</td>
-                <td>0</td>
-                <td>0</td>
-                <td>25</td>
-                <td className="py-4">
-                  <div className="flex flex-col justify-center gap-2">
-                    <Link href="/teacher/classDetails">
-                      <button className="font-bold p-2 rounded-md bg-cyan-600 text-white border-2 border-cyan-600 text-sm">
-                        View Summary
-                      </button>
-                    </Link>
-                    {/* <button className="font-bold p-2 rounded-md bg-white text-cyan-600 border-2 border-cyan-600 text-sm">
-                      Add Student
-                    </button> */}
-                  </div>
-                </td>
-              </tr>
+              {sections.map((section, index) => {
+                let sec = section.data();
+                return (
+                  <tr>
+                    <td>{sec.grade_level}</td>
+                    <td>{sec.name}</td>
+                    <td>{"to do"}</td>
+                    <td>{"to do"}</td>
+                    <td>{sec.total_students}</td>
+                    <td className="py-4">
+                      <div className="flex flex-col justify-center gap-2">
+                        <button
+                          onClick={() => {
+                            sessionStorage.setItem("section_id", sec.id);
+                            sessionStorage.setItem(
+                              "sec_grade_level",
+                              sec.grade_level
+                            );
+                            sessionStorage.setItem("sec_name", sec.name);
+                            sessionStorage.setItem(
+                              "total_students",
+                              sec.total_students
+                            );
+                            sessionStorage.setItem("school", school);
+                            router.push("/teacher/classDetails");
+                          }}
+                          className="font-bold p-2 rounded-md bg-cyan-600 text-white border-2 border-cyan-600 text-sm"
+                        >
+                          View Summary
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           )}
         </table>
@@ -110,17 +220,22 @@ export default function dashboard() {
 
               {results && (
                 <tbody>
-                  <tr>
-                    <td className="py-2">Juan dela Cruz</td>
-                    <td>2</td>
-                    <td>Sampaguita</td>
-                  </tr>
+                  {searchStudents.map((student) => {
+                    return (
+                      <tr>
+                        <td className="py-2">{student.name}</td>
+                        <td>{student.grade_level}</td>
+                        <td>{student.name}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               )}
             </table>
           </div>
         </div>
         {/* Passage Accessibility */}
+        {/* https://bobbyhadz.com/blog/react-get-element-by-id */}
         <div class=" w-1/3 flex flex-col gap-2">
           <p className="text-xl font-bold mr-3 text-orange-600 ">
             Passages Accessibility
