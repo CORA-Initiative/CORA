@@ -14,6 +14,8 @@ import {
 import { useRouter } from "next/router";
 
 export default function classDetails() {
+  const router = useRouter();
+
   const [gradeLevel, setGradeLevel] = useState(0);
   const [sectionName, setSectionName] = useState("");
   const [teacherID, setTeacherID] = useState();
@@ -23,6 +25,69 @@ export default function classDetails() {
 
   const [schoolName, setSchoolName] = useState("");
   const [region, setRegion] = useState("");
+
+  const [pretestProfileCounts, setPretestProfileCounts] = useState({
+    frustation: 0,
+    instructional: 0,
+    independent: 0,
+  });
+
+  const [posttestProfileCounts, setPosttestProfileCounts] = useState({
+    frustation: 0,
+    instructional: 0,
+    independent: 0,
+  });
+
+  const countTestProfiles = () => {
+    let pretestFrustation = 0;
+    let pretestInstructional = 0;
+    let pretestIndependent = 0;
+
+    sectionStudents.map((s) => {
+      let student = s.data();
+      console.log("Student", student);
+      switch (student.pretestProfile) {
+        case "Frustation":
+          pretestFrustation += 1;
+          break;
+        case "Instructional":
+          pretestInstructional += 1;
+          break;
+        default:
+          pretestIndependent += 1;
+      }
+    });
+
+    setPretestProfileCounts({
+      frustation: pretestFrustation,
+      instructional: pretestInstructional,
+      independent: pretestIndependent,
+    });
+
+    let posttestFrustation = 0;
+    let posttestInstructional = 0;
+    let posttestIndependent = 0;
+
+    sectionStudents.map((s) => {
+      let student = s.data();
+      switch (student.posttestProfile) {
+        case "Frustation":
+          posttestFrustation += 1;
+          break;
+        case "Instructional":
+          posttestInstructional += 1;
+          break;
+        default:
+          posttestIndependent += 1;
+      }
+    });
+
+    setPosttestProfileCounts({
+      frustation: posttestFrustation,
+      instructional: posttestInstructional,
+      independent: posttestIndependent,
+    });
+  };
 
   const getSectionStudents = async () => {
     console.log(sessionStorage.getItem("section_id"));
@@ -34,10 +99,14 @@ export default function classDetails() {
 
     const studentsSnap = await getDocs(studentsQuery);
 
-    console.log(studentsSnap.docs);
-    setSectionStudents(studentsSnap.docs);
+    if (studentsSnap) {
+      setSectionStudents(studentsSnap.docs);
+      console.log(sectionStudents);
+      countTestProfiles();
+    }
   };
 
+  // Call when rendered
   useEffect(() => {
     setGradeLevel(sessionStorage.getItem("sec_grade_level"));
     setSectionName(sessionStorage.getItem("sec_name"));
@@ -48,6 +117,11 @@ export default function classDetails() {
 
     getSectionStudents();
   }, []);
+
+  // Call when sectionStudents data change
+  useEffect(() => {
+    countTestProfiles();
+  }, [sectionStudents]);
 
   return (
     <div className="p-12 pt-4">
@@ -74,18 +148,18 @@ export default function classDetails() {
             <tbody>
               <tr>
                 <td className="border-r-2 border-black">Frustation</td>
-                <td className="px-2">0</td>
-                <td>0</td>
+                <td className="px-2">{pretestProfileCounts.frustation}</td>
+                <td>{posttestProfileCounts.frustation}</td>
               </tr>
               <tr>
                 <td className="border-r-2 border-black">Instructional</td>
-                <td className="px-2">0</td>
-                <td>0</td>
+                <td className="px-2">{pretestProfileCounts.instructional}</td>
+                <td>{posttestProfileCounts.instructional}</td>
               </tr>
               <tr>
                 <td className="border-r-2 border-black">Independent</td>
-                <td className="px-2">0</td>
-                <td>0</td>
+                <td className="px-2">{pretestProfileCounts.independent}</td>
+                <td>{posttestProfileCounts.independent}</td>
               </tr>
             </tbody>
           </table>
@@ -155,9 +229,15 @@ export default function classDetails() {
                     <td>{student.pretestProfile}</td>
                     <td>{student.posttestProfile}</td>
                     <td className="text-center">
-                      <Link href="/teacher/studentProfile">
-                        <button className="underline">View</button>
-                      </Link>
+                      <button
+                        className="underline"
+                        onClick={() => {
+                          sessionStorage.setItem("student_ref_id", student.id);
+                          router.push("/teacher/studentProfile");
+                        }}
+                      >
+                        View
+                      </button>
                     </td>
                   </tr>
                 );

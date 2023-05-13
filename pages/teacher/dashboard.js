@@ -13,15 +13,20 @@ import {
   getDoc,
   doc,
   getDocs,
+  orderBy,
+  updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 
 export default function dashboard() {
+  const router = useRouter();
+
   // Teacher details
   const [name, setName] = useState();
   const [role, setRole] = useState();
   const [isPretestEnabled, setIsPretestEnabled] = useState();
   const [isPosttestEnabled, setIsPosttestEnabled] = useState();
+  const [teacherDocID, setTeacherDocID] = useState();
 
   // Get school details
   const [school, setSchool] = useState("");
@@ -35,12 +40,38 @@ export default function dashboard() {
 
   const [pretestProfileCounts, setPretestProfileCounts] = useState({
     frustation: 0,
-    instructional,
+    instructional: 0,
+    independent: 0,
   });
-  const router = useRouter();
+
+  const [posttestProfileCounts, setPosttestProfileCounts] = useState({
+    frustation: 0,
+    instructional: 0,
+    independent: 0,
+  });
 
   // DATA RETRIEVERS
-  const getSchoolData = async (schoolRefID) => {};
+  const getSchoolData = async (schoolRefID) => {
+    const schoolRef = doc(db, "school", schoolRefID);
+    try {
+      const schoolSnap = await getDoc(schoolRef);
+
+      if (schoolSnap.exists()) {
+        let school = schoolSnap.data();
+
+        console.log(school);
+        sessionStorage.setItem("school_region", String(school.region));
+        sessionStorage.setItem("school_name", school.name);
+        sessionStorage.setItem("school_year", school.school_year);
+        setSchool(school.name);
+        setSchoolYear(school.school_year);
+      } else {
+        console.log("No document found.");
+      }
+    } catch (e) {
+      console.log("Error getting school document.");
+    }
+  };
 
   const getTeacherAndSchoolData = async () => {
     const teachersRef = collection(db, "teachers");
@@ -54,6 +85,7 @@ export default function dashboard() {
     teacherSnapshot.forEach((doc) => {
       let teacher = doc.data();
 
+      setTeacherDocID(teacher.id);
       setName(teacher.first_name + " " + teacher.last_name);
       setRole("Teacher");
       setIsPretestEnabled(teacher.isPretestEnabled);
@@ -62,32 +94,17 @@ export default function dashboard() {
       schoolRefID = teacher.school_id;
     });
 
-    const schoolRef = doc(db, "school", schoolRefID);
-    try {
-      const schoolSnap = await getDoc(schoolRef);
-
-      if (schoolSnap.exists()) {
-        let school = schoolSnap.data();
-
-        console.log(school);
-        sessionStorage.setItem("school_region", String(school.region));
-        sessionStorage.setItem("school_name", school.name);
-        setSchool(school.name);
-        setSchoolYear(school.school_year);
-      } else {
-        console.log("No document found.");
-      }
-    } catch (e) {
-      console.log("Error getting school document.");
-    }
+    getSchoolData(schoolRefID);
   };
 
   const getSectionsData = async () => {
     // TODO: Get all sections handled by the teacher
+    // TODO: Sort by grade_level
     const sectionsRef = collection(db, "section");
     const sectionsQuery = query(
       sectionsRef,
-      where("teacher_id", "==", sessionStorage.getItem("teacher_id"))
+      where("teacher_id", "==", sessionStorage.getItem("teacher_id")),
+      orderBy("grade_level")
     );
     const sectionsSnap = await getDocs(sectionsQuery);
 
@@ -102,6 +119,7 @@ export default function dashboard() {
 
   const totalTookPosttest = async () => {};
 
+  // Functions
   useEffect(() => {
     getTeacherAndSchoolData();
 
@@ -243,7 +261,7 @@ export default function dashboard() {
           <div>
             <label
               class="inline-block mr-5 hover:cursor-pointer text-lg font-bold"
-              for="flexSwitchCheckDefault"
+              for="togglePretestAccess"
             >
               Pre-test
             </label>
@@ -251,13 +269,32 @@ export default function dashboard() {
               class="mt-[0.3rem] mr-2 h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-[rgba(0,0,0,0.25)] outline-none before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-[0_0px_5px_0_rgb(0_0_0_/_7%),_0_2px_2px_0_rgb(0_0_0_/_4%)] after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-cyan-600 checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s]"
               type="checkbox"
               role="switch"
-              id="togglePosttestAccess"
+              id="togglePretestAccess"
+              onChange={() => {
+                console.log("Toggled switch");
+                setIsPretestEnabled(!isPretestEnabled);
+                // Update ispretestenabled in DB
+                const teacherRef = doc(db, "teachers", teacherDocID);
+                const data = {
+                  isPretestEnabled: !isPretestEnabled,
+                };
+                updateDoc(teacherRef, data)
+                  .then((docRef) => {
+                    console.log(
+                      "A New Document Field has been added to an existing document"
+                    );
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              }}
+              checked={isPretestEnabled}
             />
           </div>
           <div>
             <label
               class="inline-block mr-5 hover:cursor-pointer text-lg font-bold"
-              for="togglePretestAccess"
+              for="togglePosttestAccess"
             >
               Post test
             </label>
@@ -266,6 +303,25 @@ export default function dashboard() {
               type="checkbox"
               role="switch"
               id="togglePosttestAccess"
+              checked={isPosttestEnabled}
+              onChange={() => {
+                console.log("Toggled switch");
+                setIsPosttestEnabled(!isPosttestEnabled);
+                // Update ispretestenabled in DB
+                const teacherRef = doc(db, "teachers", teacherDocID);
+                const data = {
+                  isPosttestEnabled: !isPosttestEnabled,
+                };
+                updateDoc(teacherRef, data)
+                  .then((docRef) => {
+                    console.log(
+                      "A New Document Field has been added to an existing document"
+                    );
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              }}
             />
           </div>
         </div>
