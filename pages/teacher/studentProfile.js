@@ -65,7 +65,21 @@ export default function studentProfile() {
     });
   };
 
-  const getPosttestData = async () => {};
+  const getPosttestData = async () => {
+    const posttestRef = collection(db, "post-test");
+    const posttestQuery = query(
+      posttestRef,
+      where("student_id", "==", sessionStorage.getItem("student_ref_id")),
+      where("school_year", "==", sessionStorage.getItem("school_year"))
+    );
+
+    const posttestSnap = await getDocs(posttestQuery);
+
+    posttestSnap.forEach((doc) => {
+      setPosttestDate(doc.data().date_taken.toDate().toDateString());
+      setPosttestData(doc.data());
+    });
+  };
 
   const getStudentData = async () => {
     const studentRef = doc(
@@ -89,6 +103,7 @@ export default function studentProfile() {
   useEffect(() => {
     getStudentData();
     getPretestData();
+    getPosttestData();
   }, []);
   return (
     <div className="p-12 pt-4">
@@ -154,7 +169,9 @@ export default function studentProfile() {
               </tr>
               <tr>
                 <th>Comprehension Score</th>
-                <td>{pretestData.quiz_score}/0</td>
+                <td>
+                  {pretestData.quiz_score}/{pretestData.quiz_total}
+                </td>
                 <td>{pretestData.comprehension_score_percentage}%</td>
                 <td>
                   {getComprehensionProfile(
@@ -163,7 +180,7 @@ export default function studentProfile() {
                 </td>
               </tr>
               <tr>
-                <th>Reading Speed (words per minute, wpm)</th>
+                <th>Reading Speed (words per minute)</th>
                 <td>{pretestData.reading_speed} wpm</td>
               </tr>
             </tbody>
@@ -184,11 +201,11 @@ export default function studentProfile() {
           <table class="table-fixed w-1/2 text-md text-left">
             <tr>
               <th>Post Test Passage</th>
-              <td className="uppercase">Air and Sunlight</td>
+              <td className="uppercase">{posttestData.passage_title}</td>
             </tr>
             <tr>
               <td>Date Taken</td>
-              <td>February 7, 2023</td>
+              <td>{posttestDate}</td>
             </tr>
           </table>
           <table class="table-fixed w-full text-md text-left">
@@ -203,26 +220,36 @@ export default function studentProfile() {
             <tbody>
               <tr>
                 <th>Word Reading Score</th>
-                <td>0 miscues</td>
-                <td>0%</td>
-                <td>Frustation</td>
+                <td>{posttestData.number_of_miscues} miscues</td>
+                <td>{posttestData.reading_score_percentage}%</td>
+                <td>
+                  {getReadingProfile(posttestData.reading_score_percentage)}
+                </td>
               </tr>
               <tr>
                 <th>Comprehension Score</th>
-                <td>0/0</td>
-                <td>0%</td>
-                <td>Frustation</td>
+                <td>
+                  {posttestData.quiz_score}/{posttestData.quiz_total}
+                </td>
+                <td>{posttestData.comprehension_score_percentage}%</td>
+                <td>
+                  {getComprehensionProfile(
+                    posttestData.comprehension_score_percentage
+                  )}
+                </td>
               </tr>
               <tr>
-                <th>Reading Speed (words per minute, wpm)</th>
-                <td>0.0 wpm</td>
+                <th>Reading Speed (words per minute)</th>
+                <td>{posttestData.reading_speed} wpm</td>
               </tr>
             </tbody>
           </table>
           <table class="table-fixed text-md text-left w-1/2">
             <tr>
               <th>Oral Reading Profile</th>
-              <td className="uppercase font-bold underline">Frustation</td>
+              <td className="uppercase font-bold underline">
+                {posttestData.oral_reading_profile}
+              </td>
             </tr>
           </table>
         </div>

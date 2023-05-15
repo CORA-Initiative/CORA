@@ -10,6 +10,7 @@ import {
   getDoc,
   doc,
   getDocs,
+  orderBy,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 
@@ -94,7 +95,8 @@ export default function classDetails() {
     const studentsRef = collection(db, "students");
     const studentsQuery = query(
       studentsRef,
-      where("section_id", "==", sessionStorage.getItem("section_id"))
+      where("section_id", "==", sessionStorage.getItem("section_id")),
+      orderBy("last_name")
     );
 
     const studentsSnap = await getDocs(studentsQuery);
@@ -124,7 +126,7 @@ export default function classDetails() {
   }, [sectionStudents]);
 
   return (
-    <div className="p-12 pt-4">
+    <div className="p-24 pt-8">
       {/* Back button */}
       <BackButton />
       <div className="flex justify-center my-6">
@@ -220,11 +222,12 @@ export default function classDetails() {
                   <tr>
                     <td>{idx + 1}</td>
                     <td>
-                      {student.first_name +
+                      {student.last_name +
+                        ", " +
+                        student.first_name +
                         " " +
                         student.middle_name.charAt(0) +
-                        ". " +
-                        student.last_name}
+                        "."}
                     </td>
                     <td>{student.pretestProfile}</td>
                     <td>{student.posttestProfile}</td>

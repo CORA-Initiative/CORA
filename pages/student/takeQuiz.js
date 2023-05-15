@@ -116,6 +116,7 @@ export default function takeQuiz({}) {
         student_id: sessionStorage.getItem("student_id"),
         reading_speed: Number(sessionStorage.getItem("reading_speed")),
         quiz_score: Number(sessionStorage.getItem("quiz_score")),
+        quiz_total: Number(sessionStorage.getItem("total_quiz_items")),
         number_of_miscues: Number(sessionStorage.getItem("number_of_miscues")),
         reading_score_percentage:
           ((sessionStorage.getItem("total_words") -
@@ -130,6 +131,8 @@ export default function takeQuiz({}) {
         handler_id: sessionStorage.getItem("handler_id"),
         date_taken: new Date(),
         answers: answers,
+        school_year: sessionStorage.getItem("school_year"),
+        section_id: sessionStorage.getItem("student_sec_id"),
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
