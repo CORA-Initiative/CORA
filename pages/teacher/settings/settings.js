@@ -9,11 +9,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import BackButton from "@/components/BackButton";
 import { useRouter } from "next/router";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Settings() {
   const title = "Teacher Settings";
   const router = useRouter();
 
+  const { logout } = useAuth();
   const logoutTeacher = () => {
     logout();
     router.push("/");
