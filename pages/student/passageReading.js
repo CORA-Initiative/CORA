@@ -54,7 +54,7 @@ export default function passageReading() {
 
   // Record audio
   const getAudioFile = async (blob) => {
-    //const blob1 = new Blob(blob, {type:'audio/wav'});
+    //const blob1 = new Blob(blob, {type:'audio/mp3'});
     const url = URL.createObjectURL(blob);
     const audio = document.createElement("audio");
   
@@ -88,7 +88,7 @@ export default function passageReading() {
     saveAudioFile();
   }, [isRecordingCompleted, audioFile]);
 
-  
+
   useEffect(() => {
     fetchPassageTitleAndText();
   }),
