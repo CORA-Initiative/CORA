@@ -6,6 +6,7 @@ import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 
 export default function Login({ userType }) {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function Login({ userType }) {
   const [error, setError] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(true);
 
-  const { login, signup, currentUser } = useAuth();
+  const { login, signup, currentUser, logout } = useAuth();
   console.log(currentUser);
 
   // will toggle the type of entry (i.e., login or register)
@@ -34,6 +35,21 @@ export default function Login({ userType }) {
         if (userType == "teacher") {
           sessionStorage.setItem("user_type", "teacher");
           sessionStorage.setItem("teacher_id", email);
+
+          const teachersRef = collection(db, "teachers");
+          const teachersQuery = query(teachersRef, where("email", "==", email));
+          const querySnapshot = await getDocs(teachersQuery);
+
+          let teacher = null;
+          querySnapshot.forEach((doc) => {
+            teacher = doc.data();
+          });
+
+          // If user not in teacher database
+          if (teacher === null) {
+            logout();
+            toast.error("You cannot login as teacher.");
+          }
           router.push("/teacher/dashboard");
         } else {
           // User type: student
@@ -43,10 +59,17 @@ export default function Login({ userType }) {
           const studentsQuery = query(studentsRef, where("email", "==", email));
           const querySnapshot = await getDocs(studentsQuery);
 
+          let student = null;
           querySnapshot.forEach((doc) => {
-            let student = doc.data();
+            student = doc.data();
             sessionStorage.setItem("student_ref_id", student.id);
           });
+
+          // If the use is not in student DB, reject access
+          if (student === null) {
+            logout();
+            toast.error("You cannot login as student.");
+          }
           router.push("/student/dashboard");
         }
       } catch (err) {

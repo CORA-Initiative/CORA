@@ -184,8 +184,14 @@ export default function takeQuiz({}) {
   }, []);
 
   useEffect(() => {
-    console.log("currentUser", currentUser);
-    if (!sessionStorage.getItem("student_ref_id")) {
+    // If user is not logged in, redirect them to welcome page
+    if (currentUser === null) {
+      router.push("/");
+    }
+  }, []);
+  useEffect(() => {
+    // If user is not logged in, redirect them to welcome page
+    if (currentUser === null) {
       router.push("/");
     }
   }, []);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import BackButton from "@/components/BackButton";
-import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 import { db } from "../../firebase";
 import {
   collection,
@@ -109,7 +109,12 @@ export default function classDetails() {
   };
 
   // Call when rendered
+  const { currentUser } = useAuth();
   useEffect(() => {
+    if (currentUser === null) {
+      router.push("/");
+      return;
+    }
     setGradeLevel(sessionStorage.getItem("sec_grade_level"));
     setSectionName(sessionStorage.getItem("sec_name"));
     setTeacherID(sessionStorage.getItem("teacher_id"));

@@ -3,25 +3,15 @@ import BackButton from "@/components/BackButton";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { thisUser } from "@/context/UserContext";
 import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
 import { db } from "../../firebase";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  getDoc,
-  doc,
-} from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
 
 export default function passageReading() {
-  const user = thisUser();
-
   const [isRecording, setIsRecording] = useState(false);
   const [isRecordingCompleted, setIsRecordingCompleted] = useState(false);
-  const [title, setTitle] = useState();
-  const [text, setText] = useState();
+  const [title, setTitle] = useState("");
+  const [text, setText] = useState([]);
 
   const recorderControls = useAudioRecorder();
 
@@ -36,7 +26,9 @@ export default function passageReading() {
       let passage = passageSnap.data();
 
       setTitle(passage.title);
-      setText(passage.text);
+      setText(passage.text.split("\\n"));
+
+      console.log(title);
     } else {
       console.log("Failed to fetch passage.");
     }
@@ -60,18 +52,19 @@ export default function passageReading() {
 
   useEffect(() => {
     fetchPassageTitleAndText();
-  }),
-    [];
+  }, []);
 
   return (
     <div className="flex flex-col justify-between h-full">
       {/* Text */}
       <div className="p-12 md:px-16 pt-8">
         <BackButton />
-        <div className="flex flex-col flex-1  text-center py-20 px-8 md:px-20 lg:px-60 gap-12">
+        <div className="flex flex-col flex-1 text-center py-8 px-8 md:px-20 lg:px-60 gap-8">
           <h1 className="font-bold text-6xl">{title}</h1>
-          <div className="text-justify indent-12 text-3xl leading-loose">
-            {text}
+          <div className="text-justify text-3xl">
+            {text.map((line) => {
+              return <p className="indent-12 leading-loose">{line.trim()}</p>;
+            })}
           </div>
         </div>
       </div>

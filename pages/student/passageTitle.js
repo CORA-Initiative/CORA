@@ -1,19 +1,17 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import BackButton from "@/components/BackButton";
 import Link from "next/link";
-import { thisUser } from "@/context/UserContext";
 import { db } from "../../firebase";
 import { collection, query, where, getDocs, and } from "firebase/firestore";
-
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/router";
 export default function passageTitle({}) {
   const [title, setTitle] = useState();
   const [instruction, setInstruction] = useState();
+  const router = useRouter();
 
+  // Fetch grade-level appropriate passage
   const fetchPassage = async () => {
-    console.log(">>> fetchPassage()");
-    // TODO: get ID of the passage, and set as one of the tokens
-    // params: grade level, testtype
-
     console.log(sessionStorage.getItem("grade_level"));
     console.log(sessionStorage.getItem("test_type"));
 
@@ -43,8 +41,10 @@ export default function passageTitle({}) {
     fetchPassage();
   }, []);
 
+  const { currentUser } = useAuth();
   useEffect(() => {
-    if (!sessionStorage.getItem("student_ref_id")) {
+    // If user is not logged in, redirect them to welcome page
+    if (currentUser === null) {
       router.push("/");
     }
   }, []);

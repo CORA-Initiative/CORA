@@ -17,6 +17,7 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/context/AuthContext";
 
 export default function dashboard() {
   const router = useRouter();
@@ -161,13 +162,20 @@ export default function dashboard() {
   // Functions
   useEffect(() => {
     getTeacherAndSchoolData();
-
     getSectionsData();
   }, []);
 
   useEffect(() => {
     console.log("Sections data updated.");
   }, [sections]);
+
+  const { currentUser } = useAuth();
+  useEffect(() => {
+    // If user is not logged in, redirect them to welcome page
+    if (currentUser === null) {
+      router.push("/");
+    }
+  }, []);
 
   return (
     <>

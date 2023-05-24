@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import BackButton from "@/components/BackButton";
-
+import { useAuth } from "@/context/AuthContext";
 import { db } from "../../firebase";
 import {
   collection,
@@ -10,8 +10,10 @@ import {
   getDoc,
   doc,
 } from "firebase/firestore";
+import { useRouter } from "next/router";
 
 export default function studentProfile() {
+  const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState();
   const [lastName, setLastName] = useState("");
@@ -100,11 +102,17 @@ export default function studentProfile() {
     }
   };
 
+  const { currentUser } = useAuth();
   useEffect(() => {
+    if (currentUser === null) {
+      router.push("/");
+      return;
+    }
     getStudentData();
     getPretestData();
     getPosttestData();
   }, []);
+
   return (
     <div className="p-12 pt-4">
       {/* Back button */}

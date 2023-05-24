@@ -23,12 +23,10 @@ export default function quizResults() {
     setPassageTitle(sessionStorage.getItem("passage_title"));
   }, []);
 
+  const { currentUser } = useAuth();
   useEffect(() => {
-    if (
-      !sessionStorage.getItem("student_ref_id") &&
-      !sessionStorage.getItem("total_quiz_items")
-    ) {
-      console.log("You have not taken the quiz!");
+    // If user is not logged in, redirect them to welcome page
+    if (currentUser === null && !sessionStorage.getItem("total_quiz_items")) {
       router.push("/");
     }
   }, []);
