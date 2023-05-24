@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
-export default function quizResults({}) {
+export default function quizResults() {
   const [testType, setTestType] = useState("");
   const [passageTitle, setPassageTitle] = useState();
   const [score, setScore] = useState();
@@ -21,6 +21,16 @@ export default function quizResults({}) {
 
     setTestType(sessionStorage.getItem("test_type"));
     setPassageTitle(sessionStorage.getItem("passage_title"));
+  }, []);
+
+  useEffect(() => {
+    if (
+      !sessionStorage.getItem("student_ref_id") &&
+      !sessionStorage.getItem("total_quiz_items")
+    ) {
+      console.log("You have not taken the quiz!");
+      router.push("/");
+    }
   }, []);
 
   return (

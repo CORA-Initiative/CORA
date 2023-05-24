@@ -8,8 +8,8 @@ import { UserContext, thisUser } from "../context/UserContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  // const { currentUser } = useAuth();
-  // console.log(currentUser);
+  const { currentUser } = useAuth();
+  console.log("currentUser: ", currentUser);
 
   return (
     <>

@@ -41,7 +41,13 @@ export default function passageTitle({}) {
 
   useEffect(() => {
     fetchPassage();
-  });
+  }, []);
+
+  useEffect(() => {
+    if (!sessionStorage.getItem("student_ref_id")) {
+      router.push("/");
+    }
+  }, []);
 
   return (
     <div className="p-12 md:px-16 pt-8">

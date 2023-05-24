@@ -3,16 +3,15 @@ import { thisUser } from "@/context/UserContext";
 import { collection, addDoc, getDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useRouter } from "next/router";
+import { useAuth } from "@/context/AuthContext";
 
 export default function takeQuiz({}) {
-  const user = thisUser();
+  const { currentUser } = useAuth();
 
   const router = useRouter();
   const [text, setText] = useState();
   const [quiz, setQuiz] = useState([
     { question: "What", choices: ["a", "b", "c"], answer_key: "a" },
-    { question: "Why", choices: ["1", "2", "3"], answer_key: "b" },
-    { question: "How", choices: ["x", "y", "z"], answer_key: "c" },
   ]);
 
   const [answers, setAnswers] = useState([]);
@@ -158,7 +157,7 @@ export default function takeQuiz({}) {
       }
     }
 
-    console.log("Quiz core", quizScore);
+    console.log("Quiz score", quizScore);
     sessionStorage.setItem("quiz_score", quizScore);
     sessionStorage.setItem("total_quiz_items", totalQuizItems);
 
@@ -177,9 +176,18 @@ export default function takeQuiz({}) {
 
   useEffect(() => {
     getPassage();
-    sessionStorage.setItem("number_of_miscues", 3);
-    sessionStorage.setItem("reading_speed", 40);
-    sessionStorage.setItem("total_words", 50);
+
+    // TODO
+    sessionStorage.setItem("number_of_miscues", 0);
+    sessionStorage.setItem("reading_speed", 0);
+    sessionStorage.setItem("total_words", 0);
+  }, []);
+
+  useEffect(() => {
+    console.log("currentUser", currentUser);
+    if (!sessionStorage.getItem("student_ref_id")) {
+      router.push("/");
+    }
   }, []);
 
   return (
