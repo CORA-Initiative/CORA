@@ -8,5 +8,5 @@ export default function StudentLogin() {
   const user = thisUser();
   const router = useRouter();
 
-  return <>{!user.userID && <Login userType={"student"} />}</>;
+  return <>{<Login userType={"student"} />}</>;
 }

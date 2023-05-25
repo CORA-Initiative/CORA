@@ -6,12 +6,19 @@ import { thisUser } from "@/context/UserContext";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/router";
 import { db } from "../../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  doc,
+} from "firebase/firestore";
 
 // https://javascript.plainenglish.io/next-js-keep-state-7eb68984c54e
 export default function dashboard() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, currentUser } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [handlerID, setHandlerID] = useState("");
@@ -32,12 +39,29 @@ export default function dashboard() {
   });
 
   // DATA RETRIEVERS
+  const getSchoolData = async (schoolRefID) => {
+    const schoolRef = doc(db, "school", schoolRefID);
+
+    const schoolSnap = await getDoc(schoolRef);
+
+    if (schoolSnap.exists()) {
+      let school = schoolSnap.data();
+
+      console.log(school);
+      sessionStorage.setItem("school_region", String(school.region));
+      sessionStorage.setItem("school_name", school.name);
+      sessionStorage.setItem("school_year", school.school_year);
+    } else {
+      console.log("No document found.");
+    }
+  };
+
   const getStudentData = async () => {
     // Get student data from db
     const studentsRef = collection(db, "students");
     const studentsQuery = query(
       studentsRef,
-      where("email", "==", sessionStorage.getItem("student_id"))
+      where("id", "==", sessionStorage.getItem("student_ref_id"))
     );
     const querySnapshot = await getDocs(studentsQuery);
 
@@ -49,6 +73,9 @@ export default function dashboard() {
       setLastName(student.last_name);
       sessionStorage.setItem("grade_level", student.grade_level);
       sessionStorage.setItem("handler_id", student.teacher_id);
+      sessionStorage.setItem("student_sec_id", student.section_id);
+
+      getSchoolData(student.school_id);
     });
   };
 
@@ -58,7 +85,7 @@ export default function dashboard() {
     const teacherRef = collection(db, "teachers");
     const teacherQuery = query(
       teacherRef,
-      where("email", "==", sessionStorage.getItem("handler_id"))
+      where("id", "==", sessionStorage.getItem("handler_id"))
     );
     const teacherSnapshot = await getDocs(teacherQuery);
 
@@ -75,12 +102,12 @@ export default function dashboard() {
   const getPretestData = async () => {
     console.log(">>> getPretestData()");
 
-    console.log("student_id: ", sessionStorage.getItem("student_id"));
+    console.log("student_id: ", sessionStorage.getItem("student_ref_id"));
 
     const pretestRef = collection(db, "pre-test");
     const pretestQuery = query(
       pretestRef,
-      where("student_id", "==", sessionStorage.getItem("student_id"))
+      where("student_id", "==", sessionStorage.getItem("student_ref_id"))
     );
     const pretestQuerySnapshot = await getDocs(pretestQuery);
 
@@ -88,7 +115,7 @@ export default function dashboard() {
       let pretestData = doc.data();
 
       console.log("Pretest", pretestData);
-      if (pretestData.student_id === sessionStorage.getItem("student_id")) {
+      if (pretestData.student_id === sessionStorage.getItem("student_ref_id")) {
         setPreTestScores((prevScores) => ({
           ...prevScores,
           reading_score: pretestData.reading_score_percentage,
@@ -106,14 +133,16 @@ export default function dashboard() {
     const posttestRef = collection(db, "post-test");
     const posttestQuery = query(
       posttestRef,
-      where("student_id", "==", sessionStorage.getItem("student_id"))
+      where("student_id", "==", sessionStorage.getItem("student_ref_id"))
     );
     const postTestQuerySnapshot = await getDocs(posttestQuery);
 
     postTestQuerySnapshot.forEach((doc) => {
       let posttestData = doc.data();
 
-      if (posttestData.student_id === sessionStorage.getItem("student_id")) {
+      if (
+        posttestData.student_id === sessionStorage.getItem("student_ref_id")
+      ) {
         setPostTestScores((prevScores) => ({
           ...prevScores,
           reading_score: posttestData.reading_score_percentage,
@@ -132,7 +161,7 @@ export default function dashboard() {
 
   useEffect(() => {
     // A student ID must exist in sessionStorage i.e. email
-    if (sessionStorage.getItem("student_id")) {
+    if (sessionStorage.getItem("student_ref_id")) {
       // Get student data
       getStudentData();
       setTestsAvailability();
@@ -145,6 +174,13 @@ export default function dashboard() {
       router.push("/");
     }
   }, [handlerID]);
+
+  useEffect(() => {
+    // If user is not logged in, redirect them to welcome page
+    if (currentUser === null) {
+      router.push("/");
+    }
+  }, []);
 
   return (
     <div className="p-12 md:px-24 pt-8">

@@ -3,16 +3,15 @@ import { thisUser } from "@/context/UserContext";
 import { collection, addDoc, getDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useRouter } from "next/router";
+import { useAuth } from "@/context/AuthContext";
 
 export default function takeQuiz({}) {
-  const user = thisUser();
+  const { currentUser } = useAuth();
 
   const router = useRouter();
   const [text, setText] = useState();
   const [quiz, setQuiz] = useState([
     { question: "What", choices: ["a", "b", "c"], answer_key: "a" },
-    { question: "Why", choices: ["1", "2", "3"], answer_key: "b" },
-    { question: "How", choices: ["x", "y", "z"], answer_key: "c" },
   ]);
 
   const [answers, setAnswers] = useState([]);
@@ -116,6 +115,7 @@ export default function takeQuiz({}) {
         student_id: sessionStorage.getItem("student_id"),
         reading_speed: Number(sessionStorage.getItem("reading_speed")),
         quiz_score: Number(sessionStorage.getItem("quiz_score")),
+        quiz_total: Number(sessionStorage.getItem("total_quiz_items")),
         number_of_miscues: Number(sessionStorage.getItem("number_of_miscues")),
         reading_score_percentage:
           ((sessionStorage.getItem("total_words") -
@@ -130,6 +130,8 @@ export default function takeQuiz({}) {
         handler_id: sessionStorage.getItem("handler_id"),
         date_taken: new Date(),
         answers: answers,
+        school_year: sessionStorage.getItem("school_year"),
+        section_id: sessionStorage.getItem("student_sec_id"),
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -155,7 +157,7 @@ export default function takeQuiz({}) {
       }
     }
 
-    console.log("Quiz core", quizScore);
+    console.log("Quiz score", quizScore);
     sessionStorage.setItem("quiz_score", quizScore);
     sessionStorage.setItem("total_quiz_items", totalQuizItems);
 
@@ -174,9 +176,24 @@ export default function takeQuiz({}) {
 
   useEffect(() => {
     getPassage();
-    sessionStorage.setItem("number_of_miscues", 3);
-    sessionStorage.setItem("reading_speed", 40);
-    sessionStorage.setItem("total_words", 50);
+
+    // TODO
+    sessionStorage.setItem("number_of_miscues", 0);
+    sessionStorage.setItem("reading_speed", 0);
+    sessionStorage.setItem("total_words", 0);
+  }, []);
+
+  useEffect(() => {
+    // If user is not logged in, redirect them to welcome page
+    if (currentUser === null) {
+      router.push("/");
+    }
+  }, []);
+  useEffect(() => {
+    // If user is not logged in, redirect them to welcome page
+    if (currentUser === null) {
+      router.push("/");
+    }
   }, []);
 
   return (

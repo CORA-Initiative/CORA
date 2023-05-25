@@ -3,20 +3,21 @@ import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
-import { thisUser } from "@/context/UserContext";
 import { useRouter } from "next/router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 
 export default function Login({ userType }) {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(true);
 
-  const router = useRouter();
-  const { setUserID, setTeacherID, setStudentID, setUserType } = thisUser();
-
-  const { login, signup, currentUser } = useAuth();
+  const { login, signup, currentUser, logout } = useAuth();
   console.log(currentUser);
 
   // will toggle the type of entry (i.e., login or register)
@@ -34,14 +35,45 @@ export default function Login({ userType }) {
         if (userType == "teacher") {
           sessionStorage.setItem("user_type", "teacher");
           sessionStorage.setItem("teacher_id", email);
+
+          const teachersRef = collection(db, "teachers");
+          const teachersQuery = query(teachersRef, where("email", "==", email));
+          const querySnapshot = await getDocs(teachersQuery);
+
+          let teacher = null;
+          querySnapshot.forEach((doc) => {
+            teacher = doc.data();
+          });
+
+          // If user not in teacher database
+          if (teacher === null) {
+            logout();
+            toast.error("You cannot login as teacher.");
+          }
           router.push("/teacher/dashboard");
         } else {
+          // User type: student
           sessionStorage.setItem("user_type", "student");
-          sessionStorage.setItem("student_id", email);
+          // Search DB for student ref document
+          const studentsRef = collection(db, "students");
+          const studentsQuery = query(studentsRef, where("email", "==", email));
+          const querySnapshot = await getDocs(studentsQuery);
+
+          let student = null;
+          querySnapshot.forEach((doc) => {
+            student = doc.data();
+            sessionStorage.setItem("student_ref_id", student.id);
+          });
+
+          // If the use is not in student DB, reject access
+          if (student === null) {
+            logout();
+            toast.error("You cannot login as student.");
+          }
           router.push("/student/dashboard");
         }
       } catch (err) {
-        setError("Incorrect email or password.");
+        setError("Incorrect email or password. Try again.");
       }
 
       return;
@@ -78,6 +110,12 @@ export default function Login({ userType }) {
     // operations on the client side tip: Use Firebase Authentication triggers
   }
 
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
   return (
     <div>
       <div className="p-16">
@@ -86,35 +124,64 @@ export default function Login({ userType }) {
           Computerized Oral Reading Assessment
         </div>
       </div>
-      {error && <div>{error}</div>}
+
       <div className="flex items-center justify-center">
         <div className="flex flex-col w-96 p-4">
           <div>
             Enter your information to {isLoggingIn ? "login" : "register"}.
           </div>
           {!isLoggingIn && (
-            <input
-              className="w-full px-4 py-2 mt-6 border border-gray-400 rounded focus:outline-none focus:ring-1 npfocus:ring-blue-600"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              type="text"
-              placeholder="Full Name"
-            />
+            <div className="w-full mt-6 border rounded border-gray-400">
+              <input
+                className="w-full px-4 py-2  rounded focus:outline-none focus:ring-1 npfocus:ring-blue-600"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                type="text"
+                placeholder="Full Name"
+              />
+            </div>
           )}
-          <input
-            className="w-full px-4 py-2 mt-6 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            placeholder={"Enter Email"}
-          />
-          <input
-            className="w-full px-4 py-2 mt-8 border border-gray-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            placeholder="Enter Password"
-          />
+          <div className="w-full mt-6 border rounded border-gray-400">
+            <input
+              className="w-full px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-600 rounded"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              placeholder={"Enter Email"}
+            />
+          </div>
+
+          <div className="grid grid-cols-5 mt-6 border border-gray-400 rounded">
+            <input
+              className="col-span-4 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-600 rounded"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type={isPasswordVisible ? "text" : "password"}
+              placeholder="Enter Password"
+            />
+            <button className="w-full " onClick={togglePasswordVisibility}>
+              {!isPasswordVisible && (
+                <FontAwesomeIcon
+                  title="Show password"
+                  icon={faEye}
+                  color="grey"
+                />
+              )}
+              {isPasswordVisible && (
+                <FontAwesomeIcon
+                  title="Hide password"
+                  icon={faEyeSlash}
+                  color="grey"
+                />
+              )}
+            </button>
+          </div>
+
+          {error && (
+            <div className="bg-red-300 my-4 rounded-md text-center text-sm">
+              {error}
+            </div>
+          )}
           <div className="flex flex-col items-center justify-center gap-16">
             <button
               className="px-10 py-1 mt-20 text-white font-bold text-lg bg-blue-600 rounded hover:bg-blue-900"

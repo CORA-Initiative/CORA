@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
-export default function quizResults({}) {
+export default function quizResults() {
   const [testType, setTestType] = useState("");
   const [passageTitle, setPassageTitle] = useState();
   const [score, setScore] = useState();
@@ -21,6 +21,14 @@ export default function quizResults({}) {
 
     setTestType(sessionStorage.getItem("test_type"));
     setPassageTitle(sessionStorage.getItem("passage_title"));
+  }, []);
+
+  const { currentUser } = useAuth();
+  useEffect(() => {
+    // If user is not logged in, redirect them to welcome page
+    if (currentUser === null && !sessionStorage.getItem("total_quiz_items")) {
+      router.push("/");
+    }
   }, []);
 
   return (
