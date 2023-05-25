@@ -1,5 +1,5 @@
 import { React, useState, useEffect, useLayoutEffect } from "react";
-import ReadingProfileSummary from "@/components/StudentDashboard/ReadingProfileSummary";
+import ReadingProfileSummary from "@/components/studentDashboard/ReadingProfileSummary";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile } from "@fortawesome/free-solid-svg-icons";
 import { thisUser } from "@/context/UserContext";

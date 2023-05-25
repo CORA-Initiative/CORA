@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
+import { saveAs } from "file-saver";
 import { db } from "../../firebase";
 import { getDoc, doc } from "firebase/firestore";
 
@@ -12,6 +13,15 @@ export default function passageReading() {
   const [isRecordingCompleted, setIsRecordingCompleted] = useState(false);
   const [title, setTitle] = useState("");
   const [text, setText] = useState([]);
+  const [blobUrl, setBlobUrl] = useState();
+  const [audioFile, setAudioFile] = useState();
+  const [transcription, setTranscription] = useState(null);
+
+  const current = new Date();
+  const date = `_${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`;
+  // const time = `_${current.getHours()}-${current.getMinutes()}-${current.getSeconds()}`
+
+  const fileName = `${user}_${title}_${date}_audio.mp3`;
 
   const recorderControls = useAudioRecorder();
 
@@ -34,21 +44,42 @@ export default function passageReading() {
     }
   };
 
-  const getAudioFile = (blob) => {
+  // Record audio
+  const getAudioFile = async (blob) => {
+    //const blob1 = new Blob(blob, {type:'audio/mp3'});
     const url = URL.createObjectURL(blob);
     const audio = document.createElement("audio");
-
+  
     console.log("url", url);
     console.log("audio", audio);
-
-    const audioFile = new Audio(url);
-    console.log("audioFile", audioFile);
-
+  
     audio.src = url;
+    audio.type = "audio/mp3";
     audio.controls = true;
-
+    console.log("audio", audio);
+    
+    setAudioFile(audio);
     setIsRecordingCompleted(true);
+
+    setBlobUrl(url);
+    //await transcribeAudio(file);
+ 
   };
+  
+  // Save/download audio as mp3 file to client's local computer
+  useEffect(() => {
+    const saveAudioFile = async () => {
+      if (isRecordingCompleted && audioFile) {
+        const response = await fetch(audioFile.src);
+        const blobData = await response.blob();
+        const audioName = `${fileName}`;
+        saveAs(blobData, audioName);
+      }
+    };
+  
+    saveAudioFile();
+  }, [isRecordingCompleted, audioFile]);
+
 
   useEffect(() => {
     fetchPassageTitleAndText();
@@ -71,9 +102,14 @@ export default function passageReading() {
 
       {/* Footer  */}
       <div className="flex flex-row bg-coraBlue-3 justify-between items-center fixed bottom-0 p-4 w-full">
-        <AudioRecorder
+      <AudioRecorder
           onRecordingComplete={(blob) => getAudioFile(blob)}
           recorderControls={recorderControls}
+          audioTrackConstraints={{
+            noiseSuppression: true,
+            echoCancellation: true,
+          }}
+          downloadFileExtension="mp3"
         ></AudioRecorder>
 
         {/* Recording indicator */}
