@@ -1,27 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import BackButton from "@/components/BackButton";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { AudioRecorder, useAudioRecorder } from "react-audio-voice-recorder";
-import { saveAs } from "file-saver";
 import { db } from "../../firebase";
 import { getDoc, doc } from "firebase/firestore";
+import { storage } from "../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function passageReading() {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isRecordingCompleted, setIsRecordingCompleted] = useState(false);
   const [title, setTitle] = useState("");
   const [text, setText] = useState([]);
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [isRecordingCompleted, setIsRecordingCompleted] = useState(false);
   const [blobUrl, setBlobUrl] = useState();
   const [audioFile, setAudioFile] = useState();
   const [transcription, setTranscription] = useState(null);
+  const [audioURL, setAudioURL] = useState(null);
 
   const current = new Date();
-  const date = `_${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`;
-  // const time = `_${current.getHours()}-${current.getMinutes()}-${current.getSeconds()}`
+  const date = `${current.getMonth()+1}-${current.getDate()}-${current.getFullYear()}`;
 
-  const fileName = `${user}_${title}_${date}_audio.mp3`;
+  const user = "Apple";
+  const fileName = `${user}_${title}_${date}_audio.wav`;
 
   const recorderControls = useAudioRecorder();
 
@@ -52,35 +55,79 @@ export default function passageReading() {
   
     console.log("url", url);
     console.log("audio", audio);
+
+    // Save as audio as WAV File
+    const response = await fetch(url);
+    const blobData = await response.blob();
+    const file = new File([blobData], fileName, { type: "audio/wav" }, { lastModified: Date.now() });
   
     audio.src = url;
-    audio.type = "audio/mp3";
+    audio.type = "audio/wav";
     audio.controls = true;
     console.log("audio", audio);
+    // audio.download = "audio.mp3";
+    // audio.click();
     
-    setAudioFile(audio);
+    setAudioFile(file);
     setIsRecordingCompleted(true);
 
     setBlobUrl(url);
-    //await transcribeAudio(file);
- 
+    uploadAudio(file);
   };
-  
-  // Save/download audio as mp3 file to client's local computer
+
+  // Upload audio to Firestore Storage
+  const uploadAudio = (audioFile) => {
+    if (audioFile == null) return;
+
+    const audioRef = ref(storage, `audios/${fileName}`);
+    uploadBytes(audioRef, audioFile)
+      .then(() => {
+        console.log("Audio uploaded");
+        getDownloadURL(audioRef)
+          .then((url) => {
+            setAudioURL(url);
+            console.log("Download URL:", url);
+            // Do whatever you need to do with the URL here
+          })
+          .catch((error) => {
+            console.log("Error getting download URL:", error);
+          });
+      })
+    .catch((error) => {
+      console.log("Error uploading audio:", error);
+    });
+  }
+
+  // Send to sendAudio API Route and transcribe audio
   useEffect(() => {
-    const saveAudioFile = async () => {
-      if (isRecordingCompleted && audioFile) {
-        const response = await fetch(audioFile.src);
-        const blobData = await response.blob();
-        const audioName = `${fileName}`;
-        saveAs(blobData, audioName);
+    const transcribeAudio = async () => {
+      try {
+        const formData = new FormData();
+        formData.append("audioURL", audioURL);
+ 
+        const response = await fetch("/api/sendAudio", {
+          method: "POST",
+          body: formData,
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          setTranscription(data.transcription.text);
+          console.log(data.transcription.text);
+        } else {
+          console.error("[Passage] Failed to transcribe audio");
+        }
+      } catch (error) {
+        console.error("[Passage] An error occurred while transcribing audio:", error);
       }
     };
   
-    saveAudioFile();
-  }, [isRecordingCompleted, audioFile]);
+    if (isRecordingCompleted) {
+      transcribeAudio();
+    }
+  }, [audioURL, isRecordingCompleted]);
 
-
+ 
   useEffect(() => {
     fetchPassageTitleAndText();
   }, []);
@@ -102,14 +149,14 @@ export default function passageReading() {
 
       {/* Footer  */}
       <div className="flex flex-row bg-coraBlue-3 justify-between items-center fixed bottom-0 p-4 w-full">
-      <AudioRecorder
+        <AudioRecorder
           onRecordingComplete={(blob) => getAudioFile(blob)}
           recorderControls={recorderControls}
           audioTrackConstraints={{
             noiseSuppression: true,
             echoCancellation: true,
           }}
-          downloadFileExtension="mp3"
+          downloadFileExtension="wav"
         ></AudioRecorder>
 
         {/* Recording indicator */}
