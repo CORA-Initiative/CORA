@@ -2,6 +2,9 @@ import path from 'path';
 import formidable from 'formidable';
 import fs from 'fs';
 import axios from 'axios';
+import calculateReadingSpeed from "@/components/ReadingSpeed";
+import Link from "next/link";
+import { getAudioDuration } from '@/components/AudioDuration';
 
 export const config = {
   api: {
@@ -18,11 +21,11 @@ export default async function handler(req, res) {
           reject(err);
           return;
         }
-
         resolve({ fields, files });
       });
     });
-
+   
+    const fileName = formData.fields.audioName;
     // Get the audio URL
     const audioURL = formData.fields.audioURL;
     // console.log(audioURL);
@@ -56,8 +59,10 @@ export default async function handler(req, res) {
       }
     };
 
+
+
     // Define the public folder path
-    const savePath = 'public/audio.wav';
+    const savePath = "public/"+fileName;
 
     // Send the audio to Whisper API
     try {
@@ -86,9 +91,11 @@ export default async function handler(req, res) {
         }
       }
 
+
+      
       try {
         const transcriptionResult = await transcribeAudio(savePath);
-        res.status(200).json({ status: 'ok', transcription: transcriptionResult });
+        res.status(200).json({ status: 'ok', transcription: transcriptionResult});
 
       } catch (error) {
         console.error('[sent] An error occurred while transcribing audio:', error);
