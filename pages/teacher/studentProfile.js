@@ -23,20 +23,22 @@ export default function studentProfile() {
   const [posttestData, setPosttestData] = useState({});
   const [posttestDate, setPosttestDate] = useState("");
 
-  const getReadingProfile = (readingScorePercentage) => {
+  const getWordReadingProfile = (readingScorePercentage) => {
+    console.log(readingScorePercentage);
     let readingProfile = "";
     if (readingScorePercentage >= 97) {
       readingProfile = "Independent";
     } else if (readingScorePercentage >= 90 && readingScorePercentage <= 96) {
       readingProfile = "Instructional";
     } else {
-      readingProfile = "Frustation";
+      readingProfile = "Frustration";
     }
 
     return readingProfile;
   };
 
   const getComprehensionProfile = (comprehensionScorePercentage) => {
+    console.log(comprehensionScorePercentage);
     let comprehensionProfile = "";
     if (comprehensionScorePercentage >= 80) {
       comprehensionProfile = "Independent";
@@ -46,7 +48,7 @@ export default function studentProfile() {
     ) {
       comprehensionProfile = "Instructional";
     } else {
-      comprehensionProfile = "Frustation";
+      comprehensionProfile = "Frustration";
     }
 
     return comprehensionProfile;
@@ -172,7 +174,7 @@ export default function studentProfile() {
                 <td>{pretestData.number_of_miscues} miscues</td>
                 <td>{pretestData.reading_score_percentage}%</td>
                 <td>
-                  {getReadingProfile(pretestData.reading_score_percentage)}
+                  {getWordReadingProfile(pretestData.reading_score_percentage)}
                 </td>
               </tr>
               <tr>
@@ -188,8 +190,8 @@ export default function studentProfile() {
                 </td>
               </tr>
               <tr>
-                <th>Reading Speed (words per minute)</th>
-                <td>{pretestData.reading_speed} wpm</td>
+                <th>Reading Rate (words per minute)</th>
+                <td>{pretestData.reading_rate} wpm</td>
               </tr>
             </tbody>
           </table>
@@ -231,7 +233,9 @@ export default function studentProfile() {
                 <td>{posttestData.number_of_miscues} miscues</td>
                 <td>{posttestData.reading_score_percentage}%</td>
                 <td>
-                  {getReadingProfile(posttestData.reading_score_percentage)}
+                  {getWordReadingProfile(
+                    parseInt(posttestData.reading_score_percentage)
+                  )}
                 </td>
               </tr>
               <tr>
@@ -242,13 +246,13 @@ export default function studentProfile() {
                 <td>{posttestData.comprehension_score_percentage}%</td>
                 <td>
                   {getComprehensionProfile(
-                    posttestData.comprehension_score_percentage
+                    parseInt(posttestData.comprehension_score_percentage)
                   )}
                 </td>
               </tr>
               <tr>
                 <th>Reading Speed (words per minute)</th>
-                <td>{posttestData.reading_speed} wpm</td>
+                <td>{posttestData.reading_rate} wpm</td>
               </tr>
             </tbody>
           </table>

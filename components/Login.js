@@ -34,7 +34,6 @@ export default function Login({ userType }) {
 
         if (userType == "teacher") {
           sessionStorage.setItem("user_type", "teacher");
-          sessionStorage.setItem("teacher_id", email);
 
           const teachersRef = collection(db, "teachers");
           const teachersQuery = query(teachersRef, where("email", "==", email));
@@ -43,6 +42,7 @@ export default function Login({ userType }) {
           let teacher = null;
           querySnapshot.forEach((doc) => {
             teacher = doc.data();
+            sessionStorage.setItem("teacher_id", teacher.id);
           });
 
           // If user not in teacher database
@@ -50,6 +50,7 @@ export default function Login({ userType }) {
             logout();
             toast.error("You cannot login as teacher.");
           }
+
           router.push("/teacher/dashboard");
         } else {
           // User type: student

@@ -9,7 +9,6 @@ import { getDoc, doc } from "firebase/firestore";
 import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-
 export default function passageReading() {
   const [title, setTitle] = useState("");
   const [text, setText] = useState([]);
@@ -22,16 +21,18 @@ export default function passageReading() {
   const [uploadDone, setUploadDone] = useState(false);
   const [fileName, setFileName] = useState();
   const [audioTime, setAudioTime] = useState(0);
-  
+
   const userID = sessionStorage.getItem("student_ref_id");
 
   useState(() => {
     const current = new Date();
-    const date = `${current.getMonth()+1}-${current.getDate()}-${current.getFullYear()}`;
+    const date = `${
+      current.getMonth() + 1
+    }-${current.getDate()}-${current.getFullYear()}`;
     const time = `${current.getHours()}-${current.getMinutes()}-${current.getSeconds()}`;
     setFileName(`${userID}_${title}_${date}_${time}_audio.wav`);
   }, []);
-  
+
   const recorderControls = useAudioRecorder();
 
   const fetchPassageTitleAndText = async () => {
@@ -48,11 +49,25 @@ export default function passageReading() {
       setText(passage.text.split("\\n"));
 
       console.log(title);
+      // Calculate total words of passage text
+
+      const cleanedPassageText = passage.text
+        .replace(/[^\w\s\']|_/g, "")
+        .replace(/\s+/g, " ")
+        .toLowerCase()
+        .split(" ");
+      const totalWords = cleanedPassageText.length;
+
+      console.log(totalWords);
+      sessionStorage.setItem("total_words_passage", totalWords);
+
+      const passageText = passage.text.split("\\n").join("");
+      sessionStorage.setItem("passage_text", passageText);
+      console.log(sessionStorage.getItem("passage_text"));
     } else {
       console.log("Failed to fetch passage.");
     }
   };
-
 
   // Record audio
   const getAudioFile = async (blob) => {
@@ -64,22 +79,27 @@ export default function passageReading() {
     //   console.log("Audio Duration:", duration); // Duration in seconds
     //   setAudioDuration(duration);
     // });
-  
+
     console.log("url", url);
     console.log("audio", audio);
 
     // Save as audio as WAV File
     const response = await fetch(url);
     const blobData = await response.blob();
-    const file = new File([blobData], fileName, { type: "audio/wav" }, { lastModified: Date.now() });
-  
+    const file = new File(
+      [blobData],
+      fileName,
+      { type: "audio/wav" },
+      { lastModified: Date.now() }
+    );
+
     audio.src = url;
     audio.type = "audio/wav";
     audio.controls = true;
     console.log("audio", audio);
     // audio.download = "audio.mp3";
     // audio.click();
-    
+
     setAudioFile(file);
     setIsRecordingCompleted(true);
 
@@ -87,15 +107,13 @@ export default function passageReading() {
     uploadAudio(file);
   };
 
-  
   // Get the recording time of the audio
   useEffect(() => {
-    if (recorderControls.recordingTime >= audioTime){
+    if (recorderControls.recordingTime >= audioTime) {
       setAudioTime(recorderControls.recordingTime);
-    } 
+    }
   }, [recorderControls.recordingTime]);
 
-  
   // Upload audio to Firestore Storage
   const uploadAudio = (audioFile) => {
     if (audioFile == null) return;
@@ -115,11 +133,10 @@ export default function passageReading() {
             console.log("Error getting download URL:", error);
           });
       })
-    .catch((error) => {
-      console.log("Error uploading audio:", error);
-    });
-  }
-
+      .catch((error) => {
+        console.log("Error uploading audio:", error);
+      });
+  };
 
   // Upload data to session storage
   useEffect(() => {
@@ -130,7 +147,6 @@ export default function passageReading() {
     }
   }, [audioURL, fileName, audioTime]);
 
- 
   useEffect(() => {
     fetchPassageTitleAndText();
   }, []);
@@ -161,7 +177,6 @@ export default function passageReading() {
           }}
           downloadFileExtension="wav"
         ></AudioRecorder>
-        
 
         {/* Recording indicator */}
         {/* <div

@@ -48,14 +48,16 @@ export default function classDetails() {
       let student = s.data();
       console.log("Student", student);
       switch (student.pretestProfile) {
-        case "Frustation":
+        case "Frustration":
           pretestFrustation += 1;
           break;
         case "Instructional":
           pretestInstructional += 1;
           break;
-        default:
+        case "Independent":
           pretestIndependent += 1;
+        default:
+          break;
       }
     });
 
@@ -72,14 +74,16 @@ export default function classDetails() {
     sectionStudents.map((s) => {
       let student = s.data();
       switch (student.posttestProfile) {
-        case "Frustation":
+        case "Frustration":
           posttestFrustation += 1;
           break;
         case "Instructional":
           posttestInstructional += 1;
           break;
-        default:
+        case "Independent":
           posttestIndependent += 1;
+        default:
+          break;
       }
     });
 
@@ -154,7 +158,7 @@ export default function classDetails() {
             </thead>
             <tbody>
               <tr>
-                <td className="border-r-2 border-black">Frustation</td>
+                <td className="border-r-2 border-black">Frustration</td>
                 <td className="px-2">{pretestProfileCounts.frustation}</td>
                 <td>{posttestProfileCounts.frustation}</td>
               </tr>
@@ -234,8 +238,14 @@ export default function classDetails() {
                         student.middle_name.charAt(0) +
                         "."}
                     </td>
-                    <td>{student.pretestProfile}</td>
-                    <td>{student.posttestProfile}</td>
+                    <td>
+                      {student.pretestProfile ? student.pretestProfile : "TBA"}
+                    </td>
+                    <td>
+                      {student.posttestProfile
+                        ? student.posttestProfile
+                        : "TBA"}
+                    </td>
                     <td className="text-center">
                       <button
                         className="underline"
