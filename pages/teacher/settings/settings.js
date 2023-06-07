@@ -15,8 +15,6 @@ export default function Settings() {
   const title = "Teacher Settings";
   const router = useRouter();
   const { logout } = useAuth();
-
-  const { logout } = useAuth();
   const logoutTeacher = () => {
     logout();
     router.push("/");

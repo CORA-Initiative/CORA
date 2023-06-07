@@ -112,21 +112,7 @@ export default function takeQuiz({}) {
       const docRef = await addDoc(collection(db, collection_name), {
         passage_title: title,
         passage_id: sessionStorage.getItem("passage_id"),
-        student_id: sessionStorage.getItem("student_id"),
-        reading_speed: Number(sessionStorage.getItem("reading_speed")),
-        quiz_score: Number(sessionStorage.getItem("quiz_score")),
-        quiz_total: Number(sessionStorage.getItem("total_quiz_items")),
-        number_of_miscues: Number(sessionStorage.getItem("number_of_miscues")),
-        reading_score_percentage:
-          ((sessionStorage.getItem("total_words") -
-            sessionStorage.getItem("number_of_miscues")) /
-            sessionStorage.getItem("total_words")) *
-          100,
-        comprehension_score_percentage:
-          (sessionStorage.getItem("quiz_score") /
-            sessionStorage.getItem("total_quiz_items")) *
-          100,
-        oral_reading_profile: evaluateOverallReadingProfile(),
+        student_id: sessionStorage.getItem("student_ref_id"),
         handler_id: sessionStorage.getItem("handler_id"),
         date_taken: new Date(),
         answers: answers,
@@ -134,6 +120,7 @@ export default function takeQuiz({}) {
         section_id: sessionStorage.getItem("student_sec_id"),
       });
       console.log("Document written with ID: ", docRef.id);
+      sessionStorage.setItem("resultsDocID", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -143,7 +130,6 @@ export default function takeQuiz({}) {
   const checkQuizAnswers = () => {
     const answerKeys = quiz.map((item) => item.answer_key);
 
-    // TODO: Check that answers are complete ?
     console.log("Answer Keys: ", answerKeys);
     console.log("Answers:", answers);
 

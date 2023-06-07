@@ -1,5 +1,5 @@
 import { React, useState, useEffect, useLayoutEffect } from "react";
-import ReadingProfileSummary from "@/components/studentDashboard/ReadingProfileSummary";
+import ReadingProfileSummary from "@/components/StudentDashboard/ReadingProfileSummary";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile } from "@fortawesome/free-solid-svg-icons";
 import { thisUser } from "@/context/UserContext";
@@ -120,7 +120,7 @@ export default function dashboard() {
           ...prevScores,
           reading_score: pretestData.reading_score_percentage,
           comprehension_score: pretestData.comprehension_score_percentage,
-          reading_rate: pretestData.reading_speed,
+          reading_rate: pretestData.reading_rate,
         }));
       }
     });
@@ -147,7 +147,7 @@ export default function dashboard() {
           ...prevScores,
           reading_score: posttestData.reading_score_percentage,
           comprehension_score: posttestData.comprehension_score_percentage,
-          reading_rate: posttestData.reading_speed,
+          reading_rate: posttestData.reading_rate,
         }));
       }
     });

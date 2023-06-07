@@ -29,15 +29,10 @@ export default function dashboard() {
   const [isPosttestEnabled, setIsPosttestEnabled] = useState();
   const [teacherDocID, setTeacherDocID] = useState();
 
-  // Get school details
-  const [school, setSchool] = useState("");
-  const [schoolYear, setSchoolYear] = useState("20xx-20xx");
-
   const [sections, setSections] = useState([]);
 
   const results = true;
   const [searchStudents, setSearchStudents] = useState([]);
-  const [searchSections, setSearchSections] = useState([]);
 
   const [pretestProfileCounts, setPretestProfileCounts] = useState({
     frustation: 0,
@@ -64,8 +59,6 @@ export default function dashboard() {
         sessionStorage.setItem("school_region", String(school.region));
         sessionStorage.setItem("school_name", school.name);
         sessionStorage.setItem("school_year", school.school_year);
-        setSchool(school.name);
-        setSchoolYear(school.school_year);
       } else {
         console.log("No document found.");
       }
@@ -78,24 +71,22 @@ export default function dashboard() {
     const teachersRef = collection(db, "teachers");
     const teachersQuery = query(
       teachersRef,
-      where("email", "==", sessionStorage.getItem("teacher_id"))
+      where("id", "==", sessionStorage.getItem("teacher_id"))
     );
     const teacherSnapshot = await getDocs(teachersQuery);
 
-    let schoolRefID = "";
     teacherSnapshot.forEach((doc) => {
       let teacher = doc.data();
-
       setTeacherDocID(teacher.id);
       setName(teacher.first_name + " " + teacher.last_name);
       setRole("Teacher");
       setIsPretestEnabled(teacher.isPretestEnabled);
       setIsPosttestEnabled(teacher.isPosttestEnabled);
 
-      schoolRefID = teacher.school_id;
+      sessionStorage.setItem("school_ref_id", teacher.school_id);
     });
 
-    getSchoolData(schoolRefID);
+    getSchoolData(sessionStorage.getItem("school_ref_id"));
   };
 
   const getSectionsData = async () => {
@@ -160,9 +151,12 @@ export default function dashboard() {
   };
 
   // Functions
+
   useEffect(() => {
-    getTeacherAndSchoolData();
-    getSectionsData();
+    if (sections.length === 0) {
+      getTeacherAndSchoolData();
+      getSectionsData();
+    }
   }, []);
 
   useEffect(() => {
@@ -189,7 +183,8 @@ export default function dashboard() {
             <div className="">
               <p className="text-2xl font-bold">{name}</p>
               <p className="text-l">
-                {role}, {school}, SY {schoolYear}
+                {role}, {sessionStorage.getItem("school_name")}, SY{" "}
+                {sessionStorage.getItem("school_year")}
               </p>
             </div>
           </div>
@@ -250,7 +245,6 @@ export default function dashboard() {
                                 "total_students",
                                 sec.total_students
                               );
-                              sessionStorage.setItem("school", school);
                               router.push("/teacher/classDetails");
                             }}
                             className="font-bold p-2 rounded-md bg-cyan-600 text-white border-2 border-cyan-600 text-sm"

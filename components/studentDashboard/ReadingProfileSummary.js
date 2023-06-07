@@ -2,6 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBook, faClock, faFilePen } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function ReadingProfileSummary({
   test_type = "",
@@ -12,6 +13,7 @@ export default function ReadingProfileSummary({
 }) {
   const wrs_width = reading_score.toString() + "%";
   const cs_width = comprehension_score.toString() + "%";
+  const router = useRouter();
 
   return (
     <div className="flex flex-col text-center border border-coraBlue-2 pt-8 gap-8 rounded-2xl overflow-hidden ">
@@ -25,7 +27,7 @@ export default function ReadingProfileSummary({
             <FontAwesomeIcon icon={faBook} />
           </div>
           <div className="text-left w-full">
-            <h4 className="font-bold text-gray-800">Reading Score</h4>
+            <h4 className="font-bold text-gray-800">Oral Reading Score</h4>
             <div className="border border-gray-400">
               <div
                 className="text-white bg-gray-400 p-2 text-right text-xs"
@@ -61,25 +63,24 @@ export default function ReadingProfileSummary({
             <FontAwesomeIcon icon={faClock} />
           </div>
           <div className="flex flex-row text-left justify-between w-full gap-10">
-            <h4 className="font-bold text-gray-800">Reading Score</h4>
+            <h4 className="font-bold text-gray-800">Reading Rate</h4>
             <h4 className="font-bold text-xl">
               {reading_rate} words per minute
             </h4>
           </div>
         </div>
       </div>
-      <Link href="/student/passageTitle">
-        <button
-          onClick={() => {
-            sessionStorage.setItem("test_type", test_type);
-            console.log(sessionStorage.getItem("test_type"));
-          }}
-          disabled={!enableTakeTest}
-          className="mt-4 bg-coraBlue-1 p-4 text-white font-bold text-xl disabled:opacity-50 w-full"
-        >
-          Take {test_type}
-        </button>
-      </Link>
+      <button
+        onClick={() => {
+          sessionStorage.setItem("test_type", test_type);
+          console.log(sessionStorage.getItem("test_type"));
+          router.push("/student/passageTitle");
+        }}
+        disabled={!enableTakeTest}
+        className="mt-4 bg-coraBlue-1 p-4 text-white font-bold text-xl disabled:opacity-50 w-full"
+      >
+        Take {test_type}
+      </button>
     </div>
   );
 }
