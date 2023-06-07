@@ -9,6 +9,7 @@ import { getDoc, doc } from "firebase/firestore";
 import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+
 export default function passageReading() {
   const [title, setTitle] = useState("");
   const [text, setText] = useState([]);
@@ -17,15 +18,20 @@ export default function passageReading() {
   const [isRecordingCompleted, setIsRecordingCompleted] = useState(false);
   const [blobUrl, setBlobUrl] = useState();
   const [audioFile, setAudioFile] = useState();
-  const [transcription, setTranscription] = useState(null);
   const [audioURL, setAudioURL] = useState(null);
+  const [uploadDone, setUploadDone] = useState(false);
+  const [fileName, setFileName] = useState();
+  const [audioTime, setAudioTime] = useState(0);
+  
+  const userID = sessionStorage.getItem("student_ref_id");
 
-  const current = new Date();
-  const date = `${current.getMonth()+1}-${current.getDate()}-${current.getFullYear()}`;
-
-  const user = "Apple";
-  const fileName = `${user}_${title}_${date}_audio.wav`;
-
+  useState(() => {
+    const current = new Date();
+    const date = `${current.getMonth()+1}-${current.getDate()}-${current.getFullYear()}`;
+    const time = `${current.getHours()}-${current.getMinutes()}-${current.getSeconds()}`;
+    setFileName(`${userID}_${title}_${date}_${time}_audio.wav`);
+  }, []);
+  
   const recorderControls = useAudioRecorder();
 
   const fetchPassageTitleAndText = async () => {
@@ -47,11 +53,17 @@ export default function passageReading() {
     }
   };
 
+
   // Record audio
   const getAudioFile = async (blob) => {
-    //const blob1 = new Blob(blob, {type:'audio/mp3'});
     const url = URL.createObjectURL(blob);
     const audio = document.createElement("audio");
+
+    // audio.addEventListener('loadedmetadata', () => {
+    //   const duration = audio.duration;
+    //   console.log("Audio Duration:", duration); // Duration in seconds
+    //   setAudioDuration(duration);
+    // });
   
     console.log("url", url);
     console.log("audio", audio);
@@ -75,6 +87,15 @@ export default function passageReading() {
     uploadAudio(file);
   };
 
+  
+  // Get the recording time of the audio
+  useEffect(() => {
+    if (recorderControls.recordingTime >= audioTime){
+      setAudioTime(recorderControls.recordingTime);
+    } 
+  }, [recorderControls.recordingTime]);
+
+  
   // Upload audio to Firestore Storage
   const uploadAudio = (audioFile) => {
     if (audioFile == null) return;
@@ -86,6 +107,7 @@ export default function passageReading() {
         getDownloadURL(audioRef)
           .then((url) => {
             setAudioURL(url);
+            setUploadDone(true);
             console.log("Download URL:", url);
             // Do whatever you need to do with the URL here
           })
@@ -98,34 +120,15 @@ export default function passageReading() {
     });
   }
 
-  // Send to sendAudio API Route and transcribe audio
+
+  // Upload data to session storage
   useEffect(() => {
-    const transcribeAudio = async () => {
-      try {
-        const formData = new FormData();
-        formData.append("audioURL", audioURL);
- 
-        const response = await fetch("/api/sendAudio", {
-          method: "POST",
-          body: formData,
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-          setTranscription(data.transcription.text);
-          console.log(data.transcription.text);
-        } else {
-          console.error("[Passage] Failed to transcribe audio");
-        }
-      } catch (error) {
-        console.error("[Passage] An error occurred while transcribing audio:", error);
-      }
-    };
-  
-    if (isRecordingCompleted) {
-      transcribeAudio();
+    if (uploadDone) {
+      sessionStorage.setItem("audio_upload_url", audioURL);
+      sessionStorage.setItem("audio_filename", fileName);
+      sessionStorage.setItem("audio_time", audioTime);
     }
-  }, [audioURL, isRecordingCompleted]);
+  }, [audioURL, fileName, audioTime]);
 
  
   useEffect(() => {
@@ -158,6 +161,7 @@ export default function passageReading() {
           }}
           downloadFileExtension="wav"
         ></AudioRecorder>
+        
 
         {/* Recording indicator */}
         {/* <div
