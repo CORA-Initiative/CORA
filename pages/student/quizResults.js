@@ -225,11 +225,11 @@ export default function quizResults() {
     transcribeAudio();
   }, [audioURL, fileName]);
 
-  // Calculate the reading speed by calling the calculateReadingSpeed function
+  // Calculate the reading rate by calling the calculateReadingSpeed function
   useEffect(() => {
     const oralReadingSpeed =
-      (sessionStorage.getItem("total_words_passage") /
-        sessionStorage.getItem("audio_time")) *
+      (Number(sessionStorage.getItem("total_words_passage")) /
+        Number(sessionStorage.getItem("audio_time"))) *
       60;
 
     console.log(sessionStorage.getItem("total_words_passage"));
@@ -263,7 +263,8 @@ export default function quizResults() {
 
         <div className="text-center flex flex-col gap-4">
           <h1 className="font-bold text-6xl">
-            {score}/{totalQuizItems}
+            {sessionStorage.getItem("quiz_score")}/
+            {sessionStorage.getItem("total_quiz_items")}
           </h1>
         </div>
 
