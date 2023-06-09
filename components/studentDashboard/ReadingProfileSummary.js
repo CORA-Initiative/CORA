@@ -27,7 +27,7 @@ export default function ReadingProfileSummary({
             <FontAwesomeIcon icon={faBook} />
           </div>
           <div className="text-left w-full">
-            <h4 className="font-bold text-gray-800">Oral Reading Score</h4>
+            <h4 className="font-bold text-gray-800">Word Reading Score</h4>
             <div className="border border-gray-400">
               <div
                 className="text-white bg-gray-400 p-2 text-right text-xs"

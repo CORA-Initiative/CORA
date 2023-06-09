@@ -46,6 +46,9 @@ export default function dashboard() {
     independent: 0,
   });
 
+  const [areSectionsUpdated, setAreSectionsUpdated] = useState(false);
+  const [sectionsData, setSectionsData] = useState("None");
+
   // DATA RETRIEVERS
   const getSchoolData = async (schoolRefID) => {
     const schoolRef = doc(db, "school", schoolRefID);
@@ -91,7 +94,6 @@ export default function dashboard() {
 
   const getSectionsData = async () => {
     const sectionsRef = collection(db, "section");
-
     // Get sections handled by teacher by grade level
     const sectionsQuery = query(
       sectionsRef,
@@ -115,18 +117,20 @@ export default function dashboard() {
         sec.then((s) => {
           setSections((existingSections) => [
             ...existingSections.slice(0, index),
-            (existingSections[index] = s),
+            s,
             ...existingSections.slice(index + 1),
           ]);
+          console.log("getSectionsData sections:", sections);
         });
       });
+
+      // setAreSectionsUpdated(!areSectionsUpdated);
     } else {
       console.log("No section document found.");
     }
   };
 
   const totalTookPretest = async (sectionID) => {
-    console.log("sectionID: ", sectionID);
     const pretestRef = collection(db, "pre-test");
     const pretestQuery = query(
       pretestRef,
@@ -151,17 +155,52 @@ export default function dashboard() {
   };
 
   // Functions
-
   useEffect(() => {
     if (sections.length === 0) {
       getTeacherAndSchoolData();
       getSectionsData();
+
+      setAreSectionsUpdated(true);
     }
   }, []);
 
   useEffect(() => {
     console.log("Sections data updated.");
-  }, [sections]);
+    console.log(sections);
+    // setSectionsData(
+    //   sections.map((sec, index) => {
+    //     console.log("Sec", sec);
+    //     return (
+    //       <tr className="border-b-2 border-black">
+    //         <td>{sec.grade_level}</td>
+    //         <td>{sec.name}</td>
+    //         <td>{sec.tookPretest}</td>
+    //         <td>{sec.tookPosttest}</td>
+    //         <td>{sec.total_students}</td>
+    //         <td className="py-4">
+    //           <div className="flex flex-col justify-center gap-2">
+    //             <button
+    //               onClick={() => {
+    //                 sessionStorage.setItem("section_id", sec.id);
+    //                 sessionStorage.setItem("sec_grade_level", sec.grade_level);
+    //                 sessionStorage.setItem("sec_name", sec.name);
+    //                 sessionStorage.setItem(
+    //                   "total_students",
+    //                   sec.total_students
+    //                 );
+    //                 router.push("/teacher/classDetails");
+    //               }}
+    //               className="font-bold p-2 rounded-md bg-cyan-600 text-white border-2 border-cyan-600 text-sm"
+    //             >
+    //               View Summary
+    //             </button>
+    //           </div>
+    //         </td>
+    //       </tr>
+    //     );
+    //   })
+    // );
+  }, [areSectionsUpdated]);
 
   const { currentUser } = useAuth();
   useEffect(() => {
@@ -220,7 +259,7 @@ export default function dashboard() {
               </p>
             )}
 
-            {results && (
+            {areSectionsUpdated && (
               <tbody>
                 {sections.map((sec, index) => {
                   console.log("Sec", sec);
