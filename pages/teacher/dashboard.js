@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import SearchBox from "@/components/searchBox/SearchBox";
 import Link from "next/link";
 import { db } from "../../firebase";
 import {
@@ -15,8 +14,8 @@ import {
   updateDoc,
   getCountFromServer,
 } from "firebase/firestore";
-import { useRouter } from "next/router";
 import Footer from "@/components/Footer";
+import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 
 export default function dashboard() {
@@ -29,25 +28,9 @@ export default function dashboard() {
   const [isPosttestEnabled, setIsPosttestEnabled] = useState();
   const [teacherDocID, setTeacherDocID] = useState();
 
+  // Section data
   const [sections, setSections] = useState([]);
-
-  const results = true;
-  const [searchStudents, setSearchStudents] = useState([]);
-
-  const [pretestProfileCounts, setPretestProfileCounts] = useState({
-    frustation: 0,
-    instructional: 0,
-    independent: 0,
-  });
-
-  const [posttestProfileCounts, setPosttestProfileCounts] = useState({
-    frustation: 0,
-    instructional: 0,
-    independent: 0,
-  });
-
   const [areSectionsUpdated, setAreSectionsUpdated] = useState(false);
-  const [sectionsData, setSectionsData] = useState("None");
 
   // DATA RETRIEVERS
   const getSchoolData = async (schoolRefID) => {
@@ -58,8 +41,7 @@ export default function dashboard() {
       if (schoolSnap.exists()) {
         let school = schoolSnap.data();
 
-        // console.log(school);
-        sessionStorage.setItem("school_region", String(school.region));
+        sessionStorage.setItem("school_region", school.region);
         sessionStorage.setItem("school_name", school.name);
         sessionStorage.setItem("school_year", school.school_year);
       } else {
@@ -123,8 +105,6 @@ export default function dashboard() {
           console.log("getSectionsData sections:", sections);
         });
       });
-
-      // setAreSectionsUpdated(!areSectionsUpdated);
     } else {
       console.log("No section document found.");
     }
@@ -154,53 +134,15 @@ export default function dashboard() {
     return posttestSnap.data().count;
   };
 
-  // Functions
+  // ON MOUNT
   useEffect(() => {
     if (sections.length === 0) {
       getTeacherAndSchoolData();
       getSectionsData();
 
-      setAreSectionsUpdated(true);
+      setAreSectionsUpdated(true); // Section data is displayed on dashboard
     }
   }, []);
-
-  useEffect(() => {
-    console.log("Sections data updated.");
-    console.log(sections);
-    // setSectionsData(
-    //   sections.map((sec, index) => {
-    //     console.log("Sec", sec);
-    //     return (
-    //       <tr className="border-b-2 border-black">
-    //         <td>{sec.grade_level}</td>
-    //         <td>{sec.name}</td>
-    //         <td>{sec.tookPretest}</td>
-    //         <td>{sec.tookPosttest}</td>
-    //         <td>{sec.total_students}</td>
-    //         <td className="py-4">
-    //           <div className="flex flex-col justify-center gap-2">
-    //             <button
-    //               onClick={() => {
-    //                 sessionStorage.setItem("section_id", sec.id);
-    //                 sessionStorage.setItem("sec_grade_level", sec.grade_level);
-    //                 sessionStorage.setItem("sec_name", sec.name);
-    //                 sessionStorage.setItem(
-    //                   "total_students",
-    //                   sec.total_students
-    //                 );
-    //                 router.push("/teacher/classDetails");
-    //               }}
-    //               className="font-bold p-2 rounded-md bg-cyan-600 text-white border-2 border-cyan-600 text-sm"
-    //             >
-    //               View Summary
-    //             </button>
-    //           </div>
-    //         </td>
-    //       </tr>
-    //     );
-    //   })
-    // );
-  }, [areSectionsUpdated]);
 
   const { currentUser } = useAuth();
   useEffect(() => {
@@ -252,13 +194,12 @@ export default function dashboard() {
               </tr>
             </thead>
 
-            {!results && (
+            {!areSectionsUpdated && (
               <p className="text-orange-500 font-bold py-2 underline">
                 {" "}
-                No results found.
+                No section found.
               </p>
             )}
-
             {areSectionsUpdated && (
               <tbody>
                 {sections.map((sec, index) => {
@@ -300,44 +241,7 @@ export default function dashboard() {
           </table>
         </div>
 
-        {/* Search students & Passage Accessibility */}
-        <div className="flex flex-row gap-12 mt-10 justify-between">
-          {/* Search student box */}
-          <div className="w-1/2 hidden">
-            <SearchBox text="Search student"></SearchBox>
-            <div className="mt-4 w-full">
-              {/* Table header */}
-              <table className="table-auto md:table-fixed w-full text-md text-left">
-                <thead>
-                  <tr className="border-b-4 border-black text-md">
-                    <th>Name</th>
-                    <th>Grade</th>
-                    <th>Section</th>
-                  </tr>
-                </thead>
-                {!results && (
-                  <p className="text-orange-500 font-bold py-2 underline">
-                    {" "}
-                    No results found.
-                  </p>
-                )}
-
-                {results && (
-                  <tbody>
-                    {searchStudents.map((student) => {
-                      return (
-                        <tr className="border-b-2">
-                          <td className="py-2">{student.name}</td>
-                          <td>{student.grade_level}</td>
-                          <td>{student.name}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                )}
-              </table>
-            </div>
-          </div>
+        <div className="flex flex-row gap-12 mt-14 justify-between">
           {/* Passage Accessibility */}
           {/* https://bobbyhadz.com/blog/react-get-element-by-id */}
           <div class=" w-1/3 flex flex-col gap-2">

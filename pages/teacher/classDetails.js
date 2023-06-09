@@ -121,7 +121,6 @@ export default function classDetails() {
     }
     setGradeLevel(sessionStorage.getItem("sec_grade_level"));
     setSectionName(sessionStorage.getItem("sec_name"));
-    setTeacherID(sessionStorage.getItem("teacher_id"));
     setRegion(sessionStorage.getItem("school_region"));
     setSchoolName(sessionStorage.getItem("school_name"));
     setTotalStudents(sessionStorage.getItem("total_students"));
@@ -129,9 +128,8 @@ export default function classDetails() {
     getSectionStudents();
   }, []);
 
-  // Call when sectionStudents data change
   useEffect(() => {
-    countTestProfiles();
+    countTestProfiles(); // Do when sectionStudents data change
   }, [sectionStudents]);
 
   return (
@@ -146,7 +144,7 @@ export default function classDetails() {
       {/* Results and other info */}
       <div className="mt-4 flex lg:w-2/3 flex-col md:flex-row  gap-8">
         {/* Results Summary*/}
-        <div className="flex flex-col border-blue-600 gap-4">
+        <div className="flex flex-col mt-8 border-blue-600 gap-4">
           <p className="text-2xl font-bold text-coraBlue-1">Results Summary</p>
           <table class="table-fixed w-full text-left">
             <thead>
@@ -177,10 +175,12 @@ export default function classDetails() {
         </div>
       </div>
       {/* --------------------- Section Information */}
-      <div class="flex flex-col w-full mt-8 lg:w-2/3 gap-4">
-        <p class="font-bold text-2xl text-coraBlue-1">Section Information</p>
+      <div className="flex flex-col w-full mt-8 lg:w-2/3 gap-4">
+        <p className="font-bold text-2xl text-coraBlue-1">
+          Section Information
+        </p>
         <div className="flex flex-row gap-10">
-          {/* --------------------------2nd column */}
+          {/* --------------------------1st column */}
           <div className="flex flex-col w-1/2">
             <div className="flex justify-between">
               <label>Grade Level</label>
@@ -211,8 +211,6 @@ export default function classDetails() {
 
       {/* ------------------List of Students */}
       <div className="flex flex-col justify-between mt-12">
-        <SearchBox text="Search student"></SearchBox>
-
         <div className="flex flex-1 ">
           <table class="mt-4 table-fixed w-full text-md text-left">
             <thead>

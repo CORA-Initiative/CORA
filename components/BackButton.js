@@ -9,7 +9,7 @@ export default function BackButton() {
   return (
     <div className="flex flex-row gap-1">
       <button className="text-lg" type="button" onClick={() => router.back()}>
-        <FontAwesomeIcon icon={faChevronLeft} size="md" /> Back
+        <FontAwesomeIcon icon={faChevronLeft} size="sm" /> Back
       </button>
     </div>
   );

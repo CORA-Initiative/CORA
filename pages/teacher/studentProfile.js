@@ -23,12 +23,18 @@ export default function studentProfile() {
   const [posttestData, setPosttestData] = useState({});
   const [posttestDate, setPosttestDate] = useState("");
 
+  const tba = "To Be Assessed";
+
   const getWordReadingProfile = (readingScorePercentage) => {
-    console.log(readingScorePercentage);
+    if (typeof readingScorePercentage === "undefined") {
+      return tba;
+    }
+
+    const parsedPercentage = parseInt(readingScorePercentage);
     let readingProfile = "";
-    if (readingScorePercentage >= 97) {
+    if (parsedPercentage >= 97) {
       readingProfile = "Independent";
-    } else if (readingScorePercentage >= 90 && readingScorePercentage <= 96) {
+    } else if (parsedPercentage >= 90 && parsedPercentage <= 96) {
       readingProfile = "Instructional";
     } else {
       readingProfile = "Frustration";
@@ -38,14 +44,16 @@ export default function studentProfile() {
   };
 
   const getComprehensionProfile = (comprehensionScorePercentage) => {
-    console.log(comprehensionScorePercentage);
+    if (typeof comprehensionScorePercentage === "undefined") {
+      return tba;
+    }
+
+    const parsedPercentage = parseInt(comprehensionScorePercentage);
+
     let comprehensionProfile = "";
-    if (comprehensionScorePercentage >= 80) {
+    if (parsedPercentage >= 80) {
       comprehensionProfile = "Independent";
-    } else if (
-      comprehensionScorePercentage >= 59 &&
-      comprehensionScorePercentage <= 79
-    ) {
+    } else if (parsedPercentage >= 59 && parsedPercentage <= 79) {
       comprehensionProfile = "Instructional";
     } else {
       comprehensionProfile = "Frustration";
@@ -104,6 +112,7 @@ export default function studentProfile() {
     }
   };
 
+  // Authenticate user before letting page display
   const { currentUser } = useAuth();
   useEffect(() => {
     if (currentUser === null) {
@@ -116,17 +125,17 @@ export default function studentProfile() {
   }, []);
 
   return (
-    <div className="p-12 pt-4">
+    <div className="p-24 pt-8">
       {/* Back button */}
       <BackButton />
-      <div className="flex justify-center">
+      <div className="flex justify-center mt-4">
         <p className="font-bold text-3xl">Student Profile</p>
       </div>
 
       <div className="flex flex-col">
         {/* Student Details */}
         <div className="flex flex-1 py-8 px-12">
-          <table class="table-fixed w-1/2 text-md text-left">
+          <table className="table-fixed w-1/2 text-md text-left mt-4">
             <thead>
               <tr>
                 <th>Name</th>
@@ -152,14 +161,18 @@ export default function studentProfile() {
           <table class="table-fixed text-md text-left w-1/2">
             <tr>
               <th>Pre-Test Passage</th>
-              <td className="uppercase">{pretestData.passage_title}</td>
+              <td className="uppercase font-bold">
+                {pretestData.passage_title
+                  ? pretestData.passage_title
+                  : "NOT YET TAKEN"}
+              </td>
             </tr>
             <tr>
               <td>Date Taken</td>
               <td>{pretestDate}</td>
             </tr>
           </table>
-          <table class="table-fixed w-full text-md text-left">
+          <table className="table-fixed w-full text-md text-left">
             <thead>
               <tr>
                 <td></td>
@@ -199,26 +212,31 @@ export default function studentProfile() {
             <tr>
               <th>Oral Reading Profile</th>
               <td className="uppercase font-bold underline">
-                {pretestData.oral_reading_profile}
+                {pretestData.oral_reading_profile
+                  ? pretestData.oral_reading_profile
+                  : tba}
               </td>
             </tr>
           </table>
         </div>
 
         {/* Post-test Results */}
-        {/* Pre-Test Results */}
         <div className="flex flex-col p-12 border-t-4 border-cyan-600 gap-10">
-          <table class="table-fixed w-1/2 text-md text-left">
+          <table className="table-fixed w-1/2 text-md text-left">
             <tr>
               <th>Post Test Passage</th>
-              <td className="uppercase">{posttestData.passage_title}</td>
+              <td className="uppercase font-bold">
+                {posttestData.passage_title
+                  ? posttestData.passage_title
+                  : "NOT YET TAKEN"}
+              </td>
             </tr>
             <tr>
               <td>Date Taken</td>
               <td>{posttestDate}</td>
             </tr>
           </table>
-          <table class="table-fixed w-full text-md text-left">
+          <table className="table-fixed w-full text-md text-left">
             <thead>
               <tr>
                 <td></td>
@@ -233,9 +251,7 @@ export default function studentProfile() {
                 <td>{posttestData.number_of_miscues} miscues</td>
                 <td>{posttestData.reading_score_percentage}%</td>
                 <td>
-                  {getWordReadingProfile(
-                    parseInt(posttestData.reading_score_percentage)
-                  )}
+                  {getWordReadingProfile(posttestData.reading_score_percentage)}
                 </td>
               </tr>
               <tr>
@@ -246,7 +262,7 @@ export default function studentProfile() {
                 <td>{posttestData.comprehension_score_percentage}%</td>
                 <td>
                   {getComprehensionProfile(
-                    parseInt(posttestData.comprehension_score_percentage)
+                    posttestData.comprehension_score_percentage
                   )}
                 </td>
               </tr>
@@ -256,11 +272,13 @@ export default function studentProfile() {
               </tr>
             </tbody>
           </table>
-          <table class="table-fixed text-md text-left w-1/2">
+          <table className="table-fixed text-md text-left w-1/2">
             <tr>
               <th>Oral Reading Profile</th>
               <td className="uppercase font-bold underline">
-                {posttestData.oral_reading_profile}
+                {posttestData.oral_reading_profile
+                  ? posttestData.oral_reading_profile
+                  : tba}
               </td>
             </tr>
           </table>
