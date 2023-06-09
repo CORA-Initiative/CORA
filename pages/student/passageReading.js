@@ -30,7 +30,9 @@ export default function passageReading() {
       current.getMonth() + 1
     }-${current.getDate()}-${current.getFullYear()}`;
     const time = `${current.getHours()}-${current.getMinutes()}-${current.getSeconds()}`;
-    setFileName(`${userID}_${title}_${date}_${time}_audio.wav`);
+    let fileName = `${userID}_${title}_${date}_${time}_audio.wav`;
+
+    sessionStorage.setItem("audio_filename", fileName);
   }, []);
 
   const recorderControls = useAudioRecorder();
@@ -109,8 +111,11 @@ export default function passageReading() {
 
   // Get the recording time of the audio
   useEffect(() => {
-    if (recorderControls.recordingTime >= audioTime) {
-      setAudioTime(recorderControls.recordingTime);
+    if (
+      recorderControls.recordingTime >=
+      Number(sessionStorage.getItem("audio_time"))
+    ) {
+      sessionStorage.setItem("audio_time", recorderControls.recordingTime);
     }
   }, [recorderControls.recordingTime]);
 
@@ -142,10 +147,8 @@ export default function passageReading() {
   useEffect(() => {
     if (uploadDone) {
       sessionStorage.setItem("audio_upload_url", audioURL);
-      sessionStorage.setItem("audio_filename", fileName);
-      sessionStorage.setItem("audio_time", audioTime);
     }
-  }, [audioURL, fileName, audioTime]);
+  }, [audioURL]);
 
   useEffect(() => {
     fetchPassageTitleAndText();

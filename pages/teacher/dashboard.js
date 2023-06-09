@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import SearchBox from "@/components/SearchBox/SearchBox";
+import SearchBox from "@/components/searchBox/SearchBox";
 import Link from "next/link";
 import { db } from "../../firebase";
 import {
