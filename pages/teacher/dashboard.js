@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faUser } from "@fortawesome/free-solid-svg-icons";
-import SearchBox from "@/components/searchBox/SearchBox";
 import Link from "next/link";
 import { db } from "../../firebase";
 import {
@@ -15,8 +14,8 @@ import {
   updateDoc,
   getCountFromServer,
 } from "firebase/firestore";
-import { useRouter } from "next/router";
 import Footer from "@/components/Footer";
+import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 
 export default function dashboard() {
@@ -29,22 +28,9 @@ export default function dashboard() {
   const [isPosttestEnabled, setIsPosttestEnabled] = useState();
   const [teacherDocID, setTeacherDocID] = useState();
 
+  // Section data
   const [sections, setSections] = useState([]);
-
-  const results = true;
-  const [searchStudents, setSearchStudents] = useState([]);
-
-  const [pretestProfileCounts, setPretestProfileCounts] = useState({
-    frustation: 0,
-    instructional: 0,
-    independent: 0,
-  });
-
-  const [posttestProfileCounts, setPosttestProfileCounts] = useState({
-    frustation: 0,
-    instructional: 0,
-    independent: 0,
-  });
+  const [areSectionsUpdated, setAreSectionsUpdated] = useState(false);
 
   // DATA RETRIEVERS
   const getSchoolData = async (schoolRefID) => {
@@ -55,8 +41,7 @@ export default function dashboard() {
       if (schoolSnap.exists()) {
         let school = schoolSnap.data();
 
-        // console.log(school);
-        sessionStorage.setItem("school_region", String(school.region));
+        sessionStorage.setItem("school_region", school.region);
         sessionStorage.setItem("school_name", school.name);
         sessionStorage.setItem("school_year", school.school_year);
       } else {
@@ -91,7 +76,6 @@ export default function dashboard() {
 
   const getSectionsData = async () => {
     const sectionsRef = collection(db, "section");
-
     // Get sections handled by teacher by grade level
     const sectionsQuery = query(
       sectionsRef,
@@ -115,9 +99,10 @@ export default function dashboard() {
         sec.then((s) => {
           setSections((existingSections) => [
             ...existingSections.slice(0, index),
-            (existingSections[index] = s),
+            s,
             ...existingSections.slice(index + 1),
           ]);
+          console.log("getSectionsData sections:", sections);
         });
       });
     } else {
@@ -126,7 +111,6 @@ export default function dashboard() {
   };
 
   const totalTookPretest = async (sectionID) => {
-    console.log("sectionID: ", sectionID);
     const pretestRef = collection(db, "pre-test");
     const pretestQuery = query(
       pretestRef,
@@ -150,18 +134,15 @@ export default function dashboard() {
     return posttestSnap.data().count;
   };
 
-  // Functions
-
+  // ON MOUNT
   useEffect(() => {
     if (sections.length === 0) {
       getTeacherAndSchoolData();
       getSectionsData();
+
+      setAreSectionsUpdated(true); // Section data is displayed on dashboard
     }
   }, []);
-
-  useEffect(() => {
-    console.log("Sections data updated.");
-  }, [sections]);
 
   const { currentUser } = useAuth();
   useEffect(() => {
@@ -213,14 +194,13 @@ export default function dashboard() {
               </tr>
             </thead>
 
-            {!results && (
+            {!areSectionsUpdated && (
               <p className="text-orange-500 font-bold py-2 underline">
                 {" "}
-                No results found.
+                No section found.
               </p>
             )}
-
-            {results && (
+            {areSectionsUpdated && (
               <tbody>
                 {sections.map((sec, index) => {
                   console.log("Sec", sec);
@@ -261,44 +241,7 @@ export default function dashboard() {
           </table>
         </div>
 
-        {/* Search students & Passage Accessibility */}
-        <div className="flex flex-row gap-12 mt-10 justify-between">
-          {/* Search student box */}
-          <div className="w-1/2 hidden">
-            <SearchBox text="Search student"></SearchBox>
-            <div className="mt-4 w-full">
-              {/* Table header */}
-              <table className="table-auto md:table-fixed w-full text-md text-left">
-                <thead>
-                  <tr className="border-b-4 border-black text-md">
-                    <th>Name</th>
-                    <th>Grade</th>
-                    <th>Section</th>
-                  </tr>
-                </thead>
-                {!results && (
-                  <p className="text-orange-500 font-bold py-2 underline">
-                    {" "}
-                    No results found.
-                  </p>
-                )}
-
-                {results && (
-                  <tbody>
-                    {searchStudents.map((student) => {
-                      return (
-                        <tr className="border-b-2">
-                          <td className="py-2">{student.name}</td>
-                          <td>{student.grade_level}</td>
-                          <td>{student.name}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                )}
-              </table>
-            </div>
-          </div>
+        <div className="flex flex-row gap-12 mt-14 justify-between">
           {/* Passage Accessibility */}
           {/* https://bobbyhadz.com/blog/react-get-element-by-id */}
           <div class=" w-1/3 flex flex-col gap-2">

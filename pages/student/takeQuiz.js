@@ -147,6 +147,9 @@ export default function takeQuiz({}) {
     sessionStorage.setItem("quiz_score", quizScore);
     sessionStorage.setItem("total_quiz_items", totalQuizItems);
 
+    console.log("QUIZ", sessionStorage.getItem("quiz_score"));
+    console.log("TOTAL QUIZ", sessionStorage.getItem("total_quiz_items"));
+
     // TODO: Save answers and score to database
     let c_name = "";
     if (sessionStorage.getItem("test_type") == "Pre-test") {
