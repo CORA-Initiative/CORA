@@ -18,7 +18,6 @@ export default function Login({ userType }) {
   const [isLoggingIn, setIsLoggingIn] = useState(true);
 
   const { login, signup, currentUser, logout } = useAuth();
-  console.log(currentUser);
 
   // will toggle the type of entry (i.e., login or register)
   const toggleEntry = () => setIsLoggingIn(!isLoggingIn);

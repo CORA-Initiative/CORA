@@ -9,14 +9,13 @@ export default function ReadingProfileSummary({
   reading_score,
   comprehension_score,
   reading_rate,
-  enableTakeTest = false,
 }) {
   const wrs_width = reading_score.toString() + "%";
   const cs_width = comprehension_score.toString() + "%";
   const router = useRouter();
 
   return (
-    <div className="flex flex-col text-center border border-coraBlue-2 pt-8 gap-8 rounded-2xl overflow-hidden ">
+    <div className="flex flex-col text-center border border-coraBlue-2 py-10 gap-10 rounded-2xl overflow-hidden ">
       <h3 className="font-bold text-2xl">Your {test_type} Profile</h3>
 
       <div className="flex flex-col text-center gap-10 mx-12">
@@ -70,17 +69,6 @@ export default function ReadingProfileSummary({
           </div>
         </div>
       </div>
-      <button
-        onClick={() => {
-          sessionStorage.setItem("test_type", test_type);
-          console.log(sessionStorage.getItem("test_type"));
-          router.push("/student/passageTitle");
-        }}
-        disabled={!enableTakeTest}
-        className="mt-4 bg-coraBlue-1 p-4 text-white font-bold text-xl disabled:opacity-50 w-full"
-      >
-        Take {test_type}
-      </button>
     </div>
   );
 }
