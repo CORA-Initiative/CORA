@@ -208,7 +208,7 @@ export default function takeQuiz({}) {
                 <div className="flex flex-col gap-2">
                   {item.choices.map((choice) => {
                     return (
-                      <div class="flex items-center mt-4 ">
+                      <div className="flex items-center mt-4 ">
                         <input
                           required
                           checked={answers[index] === choice}
@@ -221,7 +221,7 @@ export default function takeQuiz({}) {
                           className="w-4 h-4 text-blue-600
                           cursor-pointer"
                         />
-                        <label class="ml-2 text-xl">{choice}</label>
+                        <label className="ml-2 text-xl">{choice}</label>
                       </div>
                     );
                   })}

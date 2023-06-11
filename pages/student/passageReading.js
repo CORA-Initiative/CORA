@@ -13,16 +13,15 @@ export default function passageReading() {
   const [title, setTitle] = useState("");
   const [text, setText] = useState([]);
 
-  const [isRecording, setIsRecording] = useState(false);
   const [isRecordingCompleted, setIsRecordingCompleted] = useState(false);
   const [blobUrl, setBlobUrl] = useState();
   const [audioFile, setAudioFile] = useState();
   const [audioURL, setAudioURL] = useState(null);
   const [uploadDone, setUploadDone] = useState(false);
   const [fileName, setFileName] = useState();
-  const [audioTime, setAudioTime] = useState(0);
 
   const userID = sessionStorage.getItem("student_ref_id");
+  const recorderControls = useAudioRecorder();
 
   useState(() => {
     const current = new Date();
@@ -35,12 +34,9 @@ export default function passageReading() {
     sessionStorage.setItem("audio_filename", fileName);
   }, []);
 
-  const recorderControls = useAudioRecorder();
-
   const fetchPassageTitleAndText = async () => {
     console.log("In fetchPassageTitleAndText()");
 
-    // console.log("Passage ID", sessionStorage.getItem("passage_id"));
     const passageRef = doc(db, "passage", sessionStorage.getItem("passage_id"));
     const passageSnap = await getDoc(passageRef);
 
@@ -52,7 +48,6 @@ export default function passageReading() {
 
       console.log(title);
       // Calculate total words of passage text
-
       const cleanedPassageText = passage.text
         .replace(/[^\w\s\']|_/g, "")
         .replace(/\s+/g, " ")
@@ -76,16 +71,10 @@ export default function passageReading() {
     const url = URL.createObjectURL(blob);
     const audio = document.createElement("audio");
 
-    // audio.addEventListener('loadedmetadata', () => {
-    //   const duration = audio.duration;
-    //   console.log("Audio Duration:", duration); // Duration in seconds
-    //   setAudioDuration(duration);
-    // });
-
     console.log("url", url);
     console.log("audio", audio);
 
-    // Save as audio as WAV File
+    // Save audio as WAV File
     const response = await fetch(url);
     const blobData = await response.blob();
     const file = new File(
@@ -160,7 +149,7 @@ export default function passageReading() {
       <div className="p-12 md:px-16 pt-8">
         <BackButton />
         <div className="flex flex-col flex-1 text-center py-8 px-8 md:px-20 lg:px-60 gap-8">
-          <h1 className="font-bold text-6xl">{title}</h1>
+          {/* <h1 className="font-bold text-6xl">{title}</h1> */}
           <div className="text-justify text-3xl">
             {text.map((line) => {
               return <p className="indent-12 leading-loose">{line.trim()}</p>;

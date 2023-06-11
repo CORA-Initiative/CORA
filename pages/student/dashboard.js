@@ -21,10 +21,9 @@ export default function dashboard() {
   const { logout, currentUser } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [handlerID, setHandlerID] = useState("");
 
-  const [isPretestEnabled, setIsPretestEnabled] = useState("");
-  const [isPosttestEnabled, setIsPosttestEnabled] = useState("");
+  const [isPretestEnabled, setIsPretestEnabled] = useState(false);
+  const [isPosttestEnabled, setIsPosttestEnabled] = useState(false);
 
   // Get student Pre-test and post-test data
   const [preTestScores, setPreTestScores] = useState({
@@ -77,6 +76,11 @@ export default function dashboard() {
 
       getSchoolData(student.school_id);
     });
+
+    await getPretestData();
+    await getPosttestData();
+
+    await setTestsAvailability();
   };
 
   // Set test type availability
@@ -89,12 +93,19 @@ export default function dashboard() {
     );
     const teacherSnapshot = await getDocs(teacherQuery);
 
-    teacherSnapshot.forEach((doc) => {
+    teacherSnapshot.forEach(async (doc) => {
       let teacher = doc.data();
 
       console.log("teacher:", teacher);
-      setIsPretestEnabled(teacher.isPretestEnabled);
-      setIsPosttestEnabled(teacher.isPosttestEnabled);
+
+      console.log(preTestScores, postTestScores);
+
+      let pretestRR = await getPretestData();
+      let posttestRR = await getPosttestData();
+
+      console.log("Reading rates:", pretestRR, posttestRR);
+      setIsPretestEnabled(teacher.isPretestEnabled && pretestRR === 0);
+      setIsPosttestEnabled(teacher.isPosttestEnabled && posttestRR === 0);
     });
   };
 
@@ -111,6 +122,7 @@ export default function dashboard() {
     );
     const pretestQuerySnapshot = await getDocs(pretestQuery);
 
+    let pretestReadRate = 0;
     pretestQuerySnapshot.forEach((doc) => {
       let pretestData = doc.data();
 
@@ -122,8 +134,11 @@ export default function dashboard() {
           comprehension_score: pretestData.comprehension_score_percentage,
           reading_rate: pretestData.reading_rate,
         }));
+        pretestReadRate = pretestData.reading_rate;
       }
     });
+
+    return pretestReadRate;
   };
 
   // Get posttest data of student
@@ -137,6 +152,7 @@ export default function dashboard() {
     );
     const postTestQuerySnapshot = await getDocs(posttestQuery);
 
+    let posttestReadRate = 0;
     postTestQuerySnapshot.forEach((doc) => {
       let posttestData = doc.data();
 
@@ -149,8 +165,12 @@ export default function dashboard() {
           comprehension_score: posttestData.comprehension_score_percentage,
           reading_rate: posttestData.reading_rate,
         }));
+
+        posttestReadRate = posttestData.reading_rate;
       }
     });
+
+    return posttestReadRate;
   };
 
   // FUNCTIONS
@@ -164,16 +184,13 @@ export default function dashboard() {
     if (sessionStorage.getItem("student_ref_id")) {
       // Get student data
       getStudentData();
-      setTestsAvailability();
 
       // And get pretest and posttest data if available
-      getPretestData();
-      getPosttestData();
     } else {
       console.log("Unable to identify the student.");
       router.push("/");
     }
-  }, [handlerID]);
+  }, []);
 
   useEffect(() => {
     // If user is not logged in, redirect them to welcome page
@@ -203,22 +220,45 @@ export default function dashboard() {
 
       {/* Main Content */}
       <div className="w-full flex flex-col md:flex-row gap-8 lg:gap-32 px-4 justify-center mt-16">
-        <ReadingProfileSummary
-          test_type="Pre-test"
-          reading_score={preTestScores.reading_score}
-          comprehension_score={preTestScores.comprehension_score}
-          reading_rate={preTestScores.reading_rate}
-          enableTakeTest={isPretestEnabled && preTestScores.reading_rate === 0}
-        ></ReadingProfileSummary>
-        <ReadingProfileSummary
-          test_type="Post test"
-          reading_score={postTestScores.reading_score}
-          comprehension_score={postTestScores.comprehension_score}
-          reading_rate={postTestScores.reading_rate}
-          enableTakeTest={
-            isPosttestEnabled && postTestScores.reading_rate === 0
-          }
-        ></ReadingProfileSummary>
+        <div>
+          <ReadingProfileSummary
+            test_type="Pre-test"
+            reading_score={preTestScores.reading_score}
+            comprehension_score={preTestScores.comprehension_score}
+            reading_rate={preTestScores.reading_rate}
+          ></ReadingProfileSummary>
+          <button
+            onClick={() => {
+              sessionStorage.setItem("test_type", "Pre-test");
+              console.log(sessionStorage.getItem("test_type"));
+              router.push("/student/passageTitle");
+            }}
+            disabled={!isPretestEnabled}
+            className="mt-4 bg-coraBlue-1 p-4 text-white font-bold text-xl disabled:opacity-50 w-full rounded-lg"
+          >
+            Take Pre-test
+          </button>
+        </div>
+
+        <div>
+          <ReadingProfileSummary
+            test_type="Post test"
+            reading_score={postTestScores.reading_score}
+            comprehension_score={postTestScores.comprehension_score}
+            reading_rate={postTestScores.reading_rate}
+          ></ReadingProfileSummary>
+          <button
+            onClick={() => {
+              sessionStorage.setItem("test_type", "Post test");
+              console.log(sessionStorage.getItem("test_type"));
+              router.push("/student/passageTitle");
+            }}
+            disabled={!isPosttestEnabled}
+            className="mt-4 bg-coraBlue-1 p-4 text-white font-bold text-xl disabled:opacity-50 w-full rounded-lg"
+          >
+            Take Post test
+          </button>
+        </div>
       </div>
     </div>
   );
