@@ -1,25 +1,68 @@
 import React from "react";
 
-export default function globalAlignment(sentence1, sentence2) {
-  sentence1 = sentence1
-    .replace(/[^\w\s\']|_/g, "")
-    .replace(/\s+/g, " ")
-    .toLowerCase()
-    .split(" ");
-  sentence2 = sentence2
-    .replace(/[^\w\s\']|_/g, "")
-    .replace(/\s+/g, " ")
-    .toLowerCase()
-    .split(" ");
+export default function globalAlignment(reference, transcription) {
+  // Cleans and converts the sentences into an array
+  function cleanText(text) {
+    const lowerText = text.toLowerCase();
+    const alphanumericText = lowerText.replace(/[^a-zA-Z0-9\s]/g, "");
+    const cleanedText = alphanumericText.replace(/\s{2,}/g, " ");
+    const splitText = cleanedText.split(" ");
+    return splitText;
+  }
 
-  console.log(sentence1);
-  console.log(sentence2);
+  // Made to replace specific transcribed words that would never (or less likely) to match with the reference words (e.g., Jacky and Jackie)
+  function replaceWords(words, replacements) {
+    // Iterate over each word in the array
+    const replacedWords = words.map((word) => {
+      // Check if the word is in the replacements object
+      if (replacements.hasOwnProperty(word)) {
+        // Replace the word if it matches a key in the replacements object
+        return replacements[word];
+      }
+      // Keep the word unchanged if it doesn't match any key
+      return word;
+    });
 
+    return replacedWords;
+  }
+  // The replacement object that contains all words to look out for and their corresponding replacements
+  const replacements = {
+    jackie: "jacky",
+  };
+
+  // Made to split separate words (in the Phil-IRI) that was conjoined by Whisper during transcription (e.g., window sill --> windowsill)
+  function splitWords(words, splitRules) {
+    const splittedWords = words
+      .map((word) => {
+        if (splitRules[word]) {
+          return splitRules[word];
+        }
+        return word;
+      })
+      .flat();
+
+    return splittedWords;
+  }
+  // The split rules objects that serves as basis on what words to split and how to split them
+  const splitRules = {
+    windowsill: ["window", "sill"],
+  };
+
+  console.log("Raw reference text", reference);
+  let sentence1 = cleanText(reference);
+  console.log("Cleaned reference text", sentence1);
+
+  console.log("Raw transcribed text", transcription);
+
+  let sentence2 = cleanText(transcription);
   sentence2 = sentence2.filter((word) => {
     return word !== "";
   });
+  sentence2 = replaceWords(sentence2, replacements);
+  sentence2 = splitWords(sentence2, splitRules);
 
-  console.log("Cleaned text", sentence2);
+  console.log("Cleaned transcribed text", sentence2);
+
   // initialize a 2D array to store the scores
   const score = [];
   for (let i = 0; i <= sentence1.length; i++) {

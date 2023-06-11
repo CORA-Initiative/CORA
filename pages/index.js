@@ -4,12 +4,21 @@ import { useAuth } from "../context/AuthContext";
 import { useContext } from "react";
 import { useRouter } from "next/router";
 import { UserContext, thisUser } from "../context/UserContext";
+// import globalAlignment from "@/components/Global";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const { currentUser } = useAuth();
   console.log("currentUser: ", currentUser);
+
+  // // FOR TROUBLESHOOTING PURPOSES ONLY
+  // const reference =
+  //   "Let's have some fun this summer, says Jacky. Let's swim in the river, says Lena. Let's get some star apples from the tree, says Jacky. Let's pick flowers, says Lena. That is so much fun, says Mama. But can you help me dust the window sill too? Yes, we can, Mama, they say. Helping can be fun too.";
+  // const transcription =
+  //   "Let's have some fun this supper, says Jackie. Let's swim in the river, says Lena. Let's get some star apples from the tree, says Jackie. Let's pick flowers, says Lena. That is so much fun, says Mama. But can you help me dust the windowsill too? Yes, we can, Mama, they say. Helping can be fun.";
+
+  // console.log(globalAlignment(reference, transcription));
 
   return (
     <>
