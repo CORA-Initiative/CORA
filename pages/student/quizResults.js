@@ -24,11 +24,11 @@ export default function quizResults() {
 
   const evaluateOverallReadingProfile = () => {
     // Set comprehension profile
-    const comprehensionScorePercentage =
-      Math.round(
-        Number(sessionStorage.getItem("quiz_score")) /
-          Number(sessionStorage.getItem("total_quiz_items"))
-      ) * 100;
+    const comprehensionScorePercentage = Math.round(
+      (Number(sessionStorage.getItem("quiz_score")) /
+        Number(sessionStorage.getItem("total_quiz_items"))) *
+        100
+    );
 
     let comprehensionProfile = "";
     if (comprehensionScorePercentage >= 80) {
@@ -42,12 +42,12 @@ export default function quizResults() {
       comprehensionProfile = "Frustration";
     }
 
-    const readingScorePercentage =
-      Math.round(
-        (Number(sessionStorage.getItem("total_words_passage")) -
-          Number(sessionStorage.getItem("number_of_miscues"))) /
-          Number(sessionStorage.getItem("total_words_passage"))
-      ) * 100;
+    const readingScorePercentage = Math.round(
+      ((Number(sessionStorage.getItem("total_words_passage")) -
+        Number(sessionStorage.getItem("number_of_miscues"))) /
+        Number(sessionStorage.getItem("total_words_passage"))) *
+        100
+    );
 
     let readingProfile = "";
     if (readingScorePercentage >= 97) {
@@ -100,17 +100,17 @@ export default function quizResults() {
         quiz_score: Number(sessionStorage.getItem("quiz_score")),
         quiz_total: Number(sessionStorage.getItem("total_quiz_items")),
         number_of_miscues: Number(sessionStorage.getItem("number_of_miscues")),
-        reading_score_percentage: Number(
+        reading_score_percentage: Math.round(
           ((Number(sessionStorage.getItem("total_words_passage")) -
             Number(sessionStorage.getItem("number_of_miscues"))) /
             Number(sessionStorage.getItem("total_words_passage"))) *
             100
-        ).toFixed(2),
-        comprehension_score_percentage: Number(
+        ),
+        comprehension_score_percentage: Math.round(
           (Number(sessionStorage.getItem("quiz_score")) /
             Number(sessionStorage.getItem("total_quiz_items"))) *
             100
-        ).toFixed(2),
+        ),
         oral_reading_profile: evaluateOverallReadingProfile(),
       });
 
