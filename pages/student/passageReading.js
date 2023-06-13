@@ -112,7 +112,10 @@ export default function passageReading() {
   const uploadAudio = (audioFile) => {
     if (audioFile == null) return;
 
-    const audioRef = ref(storage, `audios/${fileName}`);
+    const audioRef = ref(
+      storage,
+      `audios/${sessionStorage.getItem("audio_filename")}`
+    );
     uploadBytes(audioRef, audioFile)
       .then(() => {
         console.log("Audio uploaded");
