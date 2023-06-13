@@ -28,6 +28,10 @@ export default function globalAlignment(reference, transcription) {
   // The replacement object that contains all words to look out for and their corresponding replacements
   const replacements = {
     jackie: "jacky",
+    beam: "bim",
+    1: "one",
+    11: "eleven",
+    "11weekold": "elevenweekold",
   };
 
   // Made to split separate words (in the Phil-IRI) that was conjoined by Whisper during transcription (e.g., window sill --> windowsill)
