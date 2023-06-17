@@ -51,6 +51,26 @@ export default function Login({ userType }) {
           }
 
           router.push("/teacher/dashboard");
+        } else if (userType == "admin") {
+          sessionStorage.setItem("user_type", "admin");
+
+          const adminRef = collection(db, "admin");
+          const adminQuery = query(adminRef, where("email", "==", email));
+          const querySnapshot = await getDocs(adminQuery);
+
+          let admin = null;
+          querySnapshot.forEach((doc) => {
+            admin = doc.data();
+            sessionStorage.setItem("admin_id", admin.id);
+          });
+
+          // If user not in teacher database
+          if (admin === null) {
+            logout();
+            toast.error("You cannot login as admin.");
+          }
+
+          router.push("/admin/dashboard");
         } else {
           // User type: student
           sessionStorage.setItem("user_type", "student");
@@ -86,7 +106,7 @@ export default function Login({ userType }) {
     // the database (Firestore)
     if (userType == "teacher") {
       try {
-        const docRef = await addDoc(collection(db, "teachers"), {
+        const docRef = await addDoc(collection(db, "admin"), {
           email: credentials.user.email,
           // enter other info here except password; passwords can't be retrieved
         });

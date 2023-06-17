@@ -20,6 +20,11 @@ export default function quizResults() {
   const [fileName, setFileName] = useState();
   const [audioTime, setAudioTime] = useState();
 
+  // const [specificMiscues, setSpecificMiscues] = useState({});
+  // const [transcriptionText, setTranscriptionText] = useState("");
+  let specificMiscues = {};
+  let transcriptionText = "";
+
   const [isHomeEnabled, setIsHomeEnabled] = useState(false);
 
   const evaluateOverallReadingProfile = () => {
@@ -100,6 +105,7 @@ export default function quizResults() {
         quiz_score: Number(sessionStorage.getItem("quiz_score")),
         quiz_total: Number(sessionStorage.getItem("total_quiz_items")),
         number_of_miscues: Number(sessionStorage.getItem("number_of_miscues")),
+        specific_miscues: specificMiscues,
         reading_score_percentage: Math.round(
           ((Number(sessionStorage.getItem("total_words_passage")) -
             Number(sessionStorage.getItem("number_of_miscues"))) /
@@ -112,6 +118,7 @@ export default function quizResults() {
             100
         ),
         oral_reading_profile: evaluateOverallReadingProfile(),
+        transcription_text: transcriptionText,
       });
 
       // Update student profile
@@ -166,6 +173,12 @@ export default function quizResults() {
         console.log("Miscues", miscues);
         console.log("Number of Miscues", numberOfMiscues);
 
+        console.log("Specific Miscues: ", miscues);
+        console.log("Transcription: ", data.transcription.text);
+        specificMiscues = miscues;
+        transcriptionText = data.transcription.text;
+        // setSpecificMiscues(numberOfMiscues);
+        // setTranscriptionText(data.transcription.text);
         sessionStorage.setItem("number_of_miscues", numberOfMiscues);
 
         let c_name = "";
