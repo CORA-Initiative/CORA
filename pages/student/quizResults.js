@@ -22,8 +22,8 @@ export default function quizResults() {
 
   // const [specificMiscues, setSpecificMiscues] = useState({});
   // const [transcriptionText, setTranscriptionText] = useState("");
-  let specificMiscues = {};
-  let transcriptionText = "";
+  const [specificMiscues, setSpecificMiscues] = useState({});
+  const [transcriptionText, setTranscriptionText] = useState("");
 
   const [isHomeEnabled, setIsHomeEnabled] = useState(false);
 
@@ -175,8 +175,8 @@ export default function quizResults() {
 
         console.log("Specific Miscues: ", miscues);
         console.log("Transcription: ", data.transcription.text);
-        specificMiscues = miscues;
-        transcriptionText = data.transcription.text;
+        setSpecificMiscues(miscues);
+        setTranscriptionText(data.transcription.text);
         // setSpecificMiscues(numberOfMiscues);
         // setTranscriptionText(data.transcription.text);
         sessionStorage.setItem("number_of_miscues", numberOfMiscues);

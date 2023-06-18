@@ -284,17 +284,17 @@ export default function studentProfile() {
               </td>
             </tr>
           </table>
-          <table class="table-fixed text-md text-left w-1/2 border-spacing-4">
+          <table class="table-fixed text-md text-left w-3/4 border-spacing-4">
             <tr>
               <th className="text-lg font-bold text-coraBlue-4 uppercase">
                 Data
               </th>
             </tr>
             <tr>
-              <th>Passage Text</th>
+              <th className="">Passage Text</th>
               <th>Generated Speech transcription</th>
             </tr>
-            <tr>
+            <tr className="">
               <td className="italic">{pretestPassage.text}</td>
               <td className="italic">
                 {pretestData.transcription_text
@@ -375,7 +375,7 @@ export default function studentProfile() {
               </td>
             </tr>
           </table>
-          <table class="table-fixed text-md text-left w-1/2 border-spacing-4">
+          <table class="table-fixed text-md text-left w-3/4 border-spacing-4">
             <tr>
               <th className="text-lg font-bold text-coraBlue-4 uppercase">
                 Data
