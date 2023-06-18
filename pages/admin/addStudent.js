@@ -12,6 +12,10 @@ import {
   getDocs,
 } from "firebase/firestore";
 import BackButton from "@/components/BackButton";
+import { useAuth } from "../../context/AuthContext";
+import * as CryptoJS from "crypto-js";
+
+import { toast } from "react-toastify";
 
 export default function AddStudents() {
   const [firstName, setFirstName] = useState("");
@@ -27,6 +31,8 @@ export default function AddStudents() {
   const [teacherID, setTeacherID] = useState("");
 
   const [allSectionNames, setAllSectionNames] = useState([]);
+
+  const { login, signup, currentUser, logout } = useAuth();
 
   const getSectionsData = async () => {
     const sectionsRef = collection(db, "section");
@@ -53,33 +59,94 @@ export default function AddStudents() {
     }
   };
 
-  const registerStudent = async () => {
-    const encryptedPassword = "";
+  const getSectionIDAndTeacherID = async (
+    schoolID,
+    gradeLevel,
+    sectionName
+  ) => {
+    // Find section
+    // TODO: Get section ID and Teacher ID
+    const sectionsRef = collection(db, "section");
+    // Get sections handled by teacher by grade level
+    const sectionsQuery = query(
+      sectionsRef,
+      where("school_id", "==", schoolID),
+      where("grade_level", "==", gradeLevel),
+      where("name", "==", sectionName)
+    );
+    const sectionsSnap = await getDocs(sectionsQuery);
+
+    sectionsSnap.docs.forEach((sec, index) => {});
+  };
+
+  const encryptText = (text, pass) => {
+    console.log("To encrypt", text, pass);
+    const cipherText = CryptoJS.AES.encrypt(
+      JSON.stringify(text),
+      pass
+    ).toString();
+
+    return cipherText;
+  };
+  const decryptText = (text, pass) => {
+    console.log("To decrypt", text, pass);
+
+    const bytes = CryptoJS.AES.decrypt(text, pass);
+    const plainText = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return plainText;
+  };
+
+  const addStudentToDatabase = async (email, password) => {
+    const encryptedPassword = encryptText(
+      password,
+      process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS
+    );
+    console.log("Encrypted Pass: ", encryptedPassword);
     const docRef = await addDoc(collection(db, "students"), {
       email: email,
       first_name: firstName,
       middle_name: middleName,
       last_name: lastName,
       grade_level: Number(gradeLevel),
-      sex: sex,
+      sex: sex.toLowerCase(),
       password: encryptedPassword,
       posttestProfile: "",
       pretestProfile: "",
-      school_id: schoolID,
-      section_id: sectionID,
-      teacher_id: teacherID,
+      school_id: sessionStorage.getItem("school_ref_id"),
+      section_id: sessionStorage.getItem("section_id"),
+      teacher_id: sessionStorage.getItem("assigned_teacher"),
     });
     console.log("Document written with ID: ", docRef.id);
-
     const toUpdate = doc(db, "students", docRef.id);
     await updateDoc(toUpdate, { id: docRef.id });
+
+    toast.success("Student added to database.");
+  };
+
+  const registerStudent = async () => {
+    // Signup user: email, password
+    // Generate Password
+    const d = new Date();
+    let year = d.getFullYear();
+    const generatedPassword =
+      firstName.charAt(0).toLowerCase() +
+      middleName.charAt(0).toLocaleLowerCase() +
+      lastName.toLowerCase() +
+      year.toString();
+
+    try {
+      const credentials = await signup(email, generatedPassword);
+      addStudentToDatabase(email, generatedPassword);
+    } catch {
+      toast.error("Email already used.");
+      return;
+    }
   };
 
   useEffect(() => {
     setSectionName(sessionStorage.getItem("sec_name"));
     console.log("addStudent secname: ", sessionStorage.getItem("sec_name"));
     setGradeLevel(sessionStorage.getItem("grade_level"));
-    getSectionsData();
   });
   return (
     <div className="p-14 py-10 flex flex-col">
@@ -178,10 +245,16 @@ export default function AddStudents() {
         </div>
       </div>
       <button
+        disabled={
+          firstName === "" ||
+          middleName === "" ||
+          lastName === "" ||
+          email === ""
+        }
         onClick={registerStudent}
-        className="mt-4 px-8 py-4 rounded-md bg-coraBlue-1 text-white font-bold w-60 self-center"
+        className="mt-4 px-8 py-4 rounded-md bg-coraBlue-1 text-white font-bold w-60 self-center disabled:bg-gray-500"
       >
-        Add student
+        Add Student
       </button>
     </div>
   );

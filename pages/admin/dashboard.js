@@ -130,7 +130,7 @@ export default function dashboard() {
 
   return (
     <>
-      <div className="p-24 pt-8">
+      <div className="p-8 md:p-24 md:pt-8">
         <div className="flex py-2 flex-row justify-between mt-6 mb-10">
           <div className="w-3/4 flex flex-row gap-6">
             <div className="flex items-center overflow-hidden  text-cyan-600">
@@ -167,6 +167,7 @@ export default function dashboard() {
               <tr className="border-b-4 border-black text-lg">
                 <th>Grade Level</th>
                 <th>Name</th>
+                <th>ID</th>
 
                 <th>Total</th>
                 <th>Actions</th>
@@ -179,6 +180,7 @@ export default function dashboard() {
                   <tr className="border-b-2 border-black">
                     <td>{sec.grade_level}</td>
                     <td>{sec.name}</td>
+                    <td>{sec.id}</td>
                     <td>{sec.total_students}</td>
                     <td className="py-4">
                       <div className="flex flex-col justify-center gap-2">
@@ -200,7 +202,7 @@ export default function dashboard() {
                             );
                             router.push("/admin/classList");
                           }}
-                          className="font-bold p-2 rounded-md bg-cyan-600 text-white border-2 border-cyan-600 text-sm"
+                          className="font-bold p-2 rounded-md bg-gray-700 text-white text-sm"
                         >
                           View Class
                         </button>
@@ -254,7 +256,7 @@ export default function dashboard() {
 
                             router.push("/admin/teacherProfile");
                           }}
-                          className="font-bold p-2 rounded-md bg-cyan-600 text-white border-2 border-cyan-600 text-sm"
+                          className="font-bold p-2 rounded-md bg-gray-700 text-white text-sm"
                         >
                           View Profile
                         </button>

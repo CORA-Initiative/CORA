@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import BackButton from "@/components/BackButton";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "../../firebase";
-import {
-  collection,
-  query,
-  where,
-  getDoc,
-  doc,
-  getDocs,
-  orderBy,
-} from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { useRouter } from "next/router";
-import Footer from "@/components/Footer";
+import * as CryptoJS from "crypto-js";
+import exportFromJSON from "export-from-json";
+import { useDownloadExcel } from "react-export-table-to-excel";
 
 export default function classDetails() {
   const router = useRouter();
@@ -28,73 +22,36 @@ export default function classDetails() {
   const [schoolName, setSchoolName] = useState("");
   const [region, setRegion] = useState("");
 
-  const [pretestProfileCounts, setPretestProfileCounts] = useState({
-    frustation: 0,
-    instructional: 0,
-    independent: 0,
+  const tableRef = useRef(null);
+
+  const fileName =
+    "Grade" +
+    sessionStorage.getItem("grade_level") +
+    "_" +
+    sessionStorage.getItem("sec_name") +
+    "_LoginDetails";
+
+  const { onDownload } = useDownloadExcel({
+    currentTableRef: tableRef.current,
+    filename: fileName,
+    sheet: "students",
   });
 
-  const [posttestProfileCounts, setPosttestProfileCounts] = useState({
-    frustation: 0,
-    instructional: 0,
-    independent: 0,
-  });
+  const exportToExcel = () => {
+    console.log("Exporting data...");
+    // Grade#_SecName_
+    const exportType = "xls";
 
-  const countTestProfiles = () => {
-    let pretestFrustation = 0;
-    let pretestInstructional = 0;
-    let pretestIndependent = 0;
+    console.log("Ey", sectionStudents);
 
-    sectionStudents.map((s) => {
-      let student = s.data();
-      console.log("Student", student);
-      switch (student.pretestProfile) {
-        case "Frustration":
-          pretestFrustation += 1;
-          break;
-        case "Instructional":
-          pretestInstructional += 1;
-          break;
-        case "Independent":
-          pretestIndependent += 1;
-        default:
-          break;
-      }
-    });
-
-    setPretestProfileCounts({
-      frustation: pretestFrustation,
-      instructional: pretestInstructional,
-      independent: pretestIndependent,
-    });
-
-    let posttestFrustation = 0;
-    let posttestInstructional = 0;
-    let posttestIndependent = 0;
-
-    sectionStudents.map((s) => {
-      let student = s.data();
-      switch (student.posttestProfile) {
-        case "Frustration":
-          posttestFrustation += 1;
-          break;
-        case "Instructional":
-          posttestInstructional += 1;
-          break;
-        case "Independent":
-          posttestIndependent += 1;
-        default:
-          break;
-      }
-    });
-
-    setPosttestProfileCounts({
-      frustation: posttestFrustation,
-      instructional: posttestInstructional,
-      independent: posttestIndependent,
-    });
+    const fileName =
+      "Grade" +
+      sessionStorage.getItem("grade_level") +
+      "_" +
+      sessionStorage.getItem("sec_name") +
+      "_LoginDetails";
+    exportFromJSON(sectionStudents, fileName, exportType);
   };
-
   const getSectionStudents = async () => {
     console.log(sessionStorage.getItem("section_id"));
     const studentsRef = collection(db, "students");
@@ -107,10 +64,27 @@ export default function classDetails() {
     const studentsSnap = await getDocs(studentsQuery);
 
     if (studentsSnap) {
-      setSectionStudents(studentsSnap.docs);
-      console.log(sectionStudents);
-      countTestProfiles();
+      console.log(studentsSnap.docs);
+      let students = studentsSnap.docs.map((s, idx) => {
+        return {
+          ...s.data(),
+          password: decryptText(
+            s.data().password,
+            process.env.NEXT_PUBLIC_CRYPTO_SECRET_PASS
+          ),
+        };
+      });
+      setSectionStudents(students);
     }
+  };
+
+  const decryptText = (text, pass) => {
+    console.log("To decrypt", text, pass);
+
+    const bytes = CryptoJS.AES.decrypt(text, pass);
+    const plainText = bytes.toString(CryptoJS.enc.Utf8).replaceAll('"', "");
+    console.log(typeof plainText);
+    return plainText;
   };
 
   // Call when rendered
@@ -129,17 +103,12 @@ export default function classDetails() {
     getSectionStudents();
   }, []);
 
-  useEffect(() => {
-    countTestProfiles(); // Do when sectionStudents data change
-  }, [sectionStudents]);
-
   return (
-    <div className="p-24 pt-8">
+    <div className="p-8 md:p-24 md:pt-8">
       {/* Back button */}
       <div className="flex justify-between">
         <BackButton />
         <div className="flex justify-between gap-4">
-          {" "}
           <button
             className="p-2 px-8 rounded font-bold bg-gray-500 text-white self-end"
             onClick={() => {
@@ -163,7 +132,7 @@ export default function classDetails() {
         </div>
       </div>
 
-      <div className="flex justify-center my-6">
+      <div className="flex justify-center my-10">
         <p className="font-bold text-3xl">
           Grade {gradeLevel} - {sectionName}
         </p>
@@ -172,19 +141,22 @@ export default function classDetails() {
       {/* ------------------List of Students */}
       <div className="flex flex-col justify-between mt-12">
         <div className="flex flex-1 ">
-          <table class="mt-4 md:mx-32 mx-0 table-fixed w-full text-md text-left">
+          <table
+            ref={tableRef}
+            class="mt-4 mx-0 table-fixed w-full text-md text-left"
+          >
             <thead>
               <tr className="border-b-4 border-black">
-                <th>#</th>
+                <th className="w-10">#</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Password</th>
                 <th>ID</th>
-                <th></th>
+                <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {sectionStudents.map((s, idx) => {
-                let student = s.data();
+              {sectionStudents.map((student, idx) => {
                 return (
                   <tr>
                     <td>{idx + 1}</td>
@@ -196,6 +168,7 @@ export default function classDetails() {
                         student.middle_name}
                     </td>
                     <td className="break-words">{student.email}</td>
+                    <td className="break-words">{student.password}</td>
                     <td className="break-words">{student.id}</td>
 
                     <td className="text-center">
@@ -215,6 +188,12 @@ export default function classDetails() {
             </tbody>
           </table>
         </div>
+        <button
+          className="my-12 p-2 px-8 rounded font-bold bg-black text-white w-fit fixed-bottom"
+          onClick={onDownload}
+        >
+          Export as sheets (.xls)
+        </button>
       </div>
     </div>
   );

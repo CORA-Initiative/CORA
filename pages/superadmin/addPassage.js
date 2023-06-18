@@ -13,6 +13,16 @@ export default function addPassage() {
   const [type, setType] = useState("Pre-test");
   const [quiz, setQuiz] = useState([]);
 
+  const encryptText = (text, pass) => {
+    console.log("To encrypt", text, pass);
+    const cipherText = CryptoJS.AES.encrypt(
+      JSON.stringify(text),
+      pass
+    ).toString();
+
+    return cipherText;
+  };
+
   const uploadPassage = async () => {
     const docRef = await addDoc(collection(db, "passage"), {
       title: "",
