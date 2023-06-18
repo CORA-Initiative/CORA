@@ -1,9 +1,10 @@
 import BackButton from "@/components/BackButton";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
-
+import { useRouter } from "next/router";
 export default function settings() {
   const { logout, currentUser } = useAuth();
+  const router = useRouter();
 
   const logoutAdmin = () => {
     logout();

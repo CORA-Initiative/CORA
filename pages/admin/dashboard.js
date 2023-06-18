@@ -183,7 +183,7 @@ export default function dashboard() {
                     <td>{sec.id}</td>
                     <td>{sec.total_students}</td>
                     <td className="py-4">
-                      <div className="flex flex-col justify-center gap-2">
+                      <div className="flex flex-row justify-center gap-2">
                         <button
                           onClick={() => {
                             sessionStorage.setItem("section_id", sec.id);
@@ -202,9 +202,31 @@ export default function dashboard() {
                             );
                             router.push("/admin/classList");
                           }}
-                          className="font-bold p-2 rounded-md bg-gray-700 text-white text-sm"
+                          className="font-bold p-2 rounded-md bg-red-600 text-white text-sm"
                         >
-                          View Class
+                          Remove
+                        </button>
+                        <button
+                          onClick={() => {
+                            sessionStorage.setItem("section_id", sec.id);
+                            sessionStorage.setItem(
+                              "sec_grade_level",
+                              sec.grade_level
+                            );
+                            sessionStorage.setItem("sec_name", sec.name);
+                            sessionStorage.setItem(
+                              "assigned_teacher",
+                              sec.teacher_id
+                            );
+                            sessionStorage.setItem(
+                              "total_students",
+                              sec.total_students
+                            );
+                            router.push("/admin/classList");
+                          }}
+                          className="font-bold p-2 px-6 rounded-md bg-cyan-700 text-white text-sm"
+                        >
+                          View class list
                         </button>
                       </div>
                     </td>
@@ -249,14 +271,22 @@ export default function dashboard() {
                     <td>{t.email}</td>
                     <td>{t.id}</td>
                     <td className="py-4">
-                      <div className="flex flex-col justify-center gap-2">
+                      <div className="flex flex-row justify-center gap-2">
+                        <button
+                          onClick={() => {
+                            console.log("Cannot delete.");
+                          }}
+                          className="font-bold p-2 rounded-md bg-red-600 text-white text-sm"
+                        >
+                          Remove
+                        </button>
                         <button
                           onClick={() => {
                             sessionStorage.setItem("teacher_ref_id", t.id);
 
                             router.push("/admin/teacherProfile");
                           }}
-                          className="font-bold p-2 rounded-md bg-gray-700 text-white text-sm"
+                          className="font-bold p-2 px-8 rounded-md bg-cyan-700 text-white text-sm"
                         >
                           View Profile
                         </button>

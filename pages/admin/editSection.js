@@ -16,7 +16,7 @@ export default function settings() {
       </div>
 
       <div className="flex flex-col gap-8 md:w-1/2">
-        <p className="font-bold text-xl">Add Section Details</p>
+        <p className="font-bold text-xl">Edit Section Details</p>
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2">
             <label className="font-bold">Grade Level</label>
